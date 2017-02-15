@@ -8,6 +8,8 @@ struct Piece {
 	int seq[3];
 };
 
+struct Playing_field_coords {int x, y;};
+
 
 int main(int argc, char const *argv[]) {
 	int num_parts = 0;
