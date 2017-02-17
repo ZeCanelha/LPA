@@ -4,7 +4,7 @@
 
 /*CONSTANTS & STRUCTS ------------------------------------------------------------*/
 
-#define MAX_PIECES 3
+#define MAX_PIECES 19
 
 int num_parts = 1;
 
@@ -34,7 +34,6 @@ int main(int argc, char const *argv[]) {
 		num_parts++;
 
 	}
-	printField();
 
 	return 0;
 }
@@ -57,7 +56,7 @@ int isSideMatched () {
 
 /*checks if position is empty*/
 int isEmpty (int x, int y) {
-	if(playing_field[x][y].seq[0] == 6)
+	if(playing_field[x][y].seq[0] == -1)
 		return 1;
 	else
 		return 0;
