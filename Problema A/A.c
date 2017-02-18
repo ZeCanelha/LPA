@@ -30,7 +30,7 @@ void printField ();
 int itMatches (Side pieceSide, Side neighbourSide);
 void putOnPosition (int x, int y, Piece myPiece);
 int sideMatches (Side pieceSide, Side neighbourSide);
-void recursive_method (int num_parts, int x, int y);
+int recursive_method (int num_parts, int x, int y);
 
 /*FUNCTIONS ---------------------------------------------------------------------*/
 int main(int argc, char const *argv[]) {
@@ -57,36 +57,39 @@ int main(int argc, char const *argv[]) {
 int recursive_method (int num_parts, int x, int y) {
 	int score = 0;
 
+	/*cada vez q se invoca o método tem de ficar guardado o estado do tabuleiro e das peças q faltam???*/
+
 	if (num_parts == 0){
 		return score;
 	} else {
 		if (isEmpty(x-1, y)){ /*Side a*/
-			score += checkMatch (playing_field[x][y], num_parts - 1);
-		} else if (isEmpty(x+1, y)) { /*Side b*/
-
-		} else { /*Side c*/
-			if (x % 2 == y % 2 && isEmpty(x, y+1)) {
-
-
-			} else if (x % 2 != y % 2 && isEmpty(x, y-1)) {
-
-			}
-
+			/*score += checkMatch (playing_field[x][y], x-1, y);*/
+			return recursive_method (num_parts -1, x-1, y);
 		}
-
-		return recursive_method(num_parts - 1, );
+		if (isEmpty(x+1, y)) { /*Side b*/
+			return recursive_method (num_parts -1, x+1, y);
+		}
+		if (x % 2 == y % 2 && isEmpty(x, y+1)) {
+			return recursive_method (num_parts -1, x, y+1);
+		} else if (x % 2 != y % 2 && isEmpty(x, y-1)) {
+			return recursive_method (num_parts -1, x, y-1);
+		} else {
+			return score;
+		}
 	}
 }
 
 /*method that checks any possible neighbour to put on field*/
-int checkMatch(Piece* myPiece, int available_pieces){
-	int i;
-	for (i = num_parts -1; i => num_parts - available_pieces; i--) {
-		/* code */
-	}
-	putOnPosition (x, y+1, neighbour);
-	return sideMatches (Side pieceSide, Side neighbourSide);
+int checkMatch(Piece* myPiece){
 
+
+
+	/*testar todas as combinações com peças disponiveis ainda para jogar*/
+
+	/*coloca no tabuleiro o vizinho escolhido
+	putOnPosition (x, y+1, neighbour);*/
+
+	return 0;
 }
 
 
