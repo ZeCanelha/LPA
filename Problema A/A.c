@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_PIECES 3
+#define MAX_PIECES 2
 
 /* STRUCTS AND CONSTANTS ------------------------------------------------------------*/
 typedef struct {
@@ -18,7 +18,9 @@ struct Playing_field_coords {
 	int x, y;
 };
 
-int num_parts = 0;
+int num_parts = 0, score = 0, i = 0;
+
+int scores[200]; /*isto nao esta muito bem assim*/
 
 Piece available_pieces[MAX_PIECES];
 Piece playing_field[MAX_PIECES][MAX_PIECES]; /* se x e y tiverem a mesma paridade, entao a face é voltada para cima; caso contrário a face é voltada para baixo*/
@@ -27,16 +29,15 @@ Piece playing_field[MAX_PIECES][MAX_PIECES]; /* se x e y tiverem a mesma paridad
 void rotate_piece (Piece * my_piece);
 int isEmpty (int x, int y);
 void printField ();
-int itMatches (Side pieceSide, Side neighbourSide);
-void putOnPosition (int x, int y, Piece myPiece);
-int sideMatches (Side pieceSide, Side neighbourSide);
-int recursive_method (int num_parts, int x, int y);
+void putOnPosition (int x, int y, Piece* available_pieces, int index);
+int recursive_method (int num_parts, int x, int y, Piece available_pieces[], Piece playing_field[MAX_PIECES][MAX_PIECES], int score);
+int checkMatch(Piece myPiece, int x, int y, Piece* available_pieces, char myPieceSide);
 
 /*FUNCTIONS ---------------------------------------------------------------------*/
 int main(int argc, char const *argv[]) {
-
 	/*in the begining everything is empty -1*/
 	memset (playing_field, -1, sizeof(playing_field));
+	memset (scores, -1, sizeof(scores));
 
 	while(scanf("%d %d %d",&available_pieces[num_parts].seq[0], &available_pieces[num_parts].seq[1],&available_pieces[num_parts].seq[2]) != EOF && num_parts < MAX_PIECES-1) {
 		available_pieces[num_parts].a.first = available_pieces[num_parts].seq[0];
@@ -47,49 +48,89 @@ int main(int argc, char const *argv[]) {
 		available_pieces[num_parts].c.second = available_pieces[num_parts].seq[3];
 		num_parts++;
 	}
-	putOnPosition (num_parts/2, num_parts/2, available_pieces[num_parts]);
-	printField();
-	printf("%d\n", recursive_method(num_parts, num_parts/2, num_parts/2));
+	/*coloca a primeira peça no centro*/
+	putOnPosition (num_parts/2, num_parts/2, available_pieces, 0);
 
+	printField();
+
+	int length = recursive_method(num_parts, num_parts/2, num_parts/2, available_pieces, playing_field, score);
+
+	/*find max score*/
+	int maxValue = scores[0];
+	for (i = 0; i < length; ++i) {
+		if ( scores[i] > maxValue ) {
+		 	maxValue = scores[i];
+		} else if (scores[i] == -1) {
+			break;
+		}
+	}
+	printf("%d\n", maxValue);
 	return 0;
 }
 
-int recursive_method (int num_parts, int x, int y) {
-	int score = 0;
+int recursive_method (int num_parts, int x, int y, Piece available_pieces[], Piece playing_field[MAX_PIECES][MAX_PIECES], int score) {
 
-	/*cada vez q se invoca o método tem de ficar guardado o estado do tabuleiro e das peças q faltam???*/
-
+	/*cada vez que se invoca o metodo recursivo uma copia do tabuleiro e das peças disponiveis tem que ser guardada*/
 	if (num_parts == 0){
-		return score;
+		scores[i] = score;
+		i++;
+		return i;
 	} else {
-		if (isEmpty(x-1, y)){ /*Side a*/
-			/*score += checkMatch (playing_field[x][y], x-1, y);*/
-			return recursive_method (num_parts -1, x-1, y);
+		if (playing_field[x-1][y].seq[0] == -1){ /*Side a*/
+			score += checkMatch (playing_field[x][y], x-1, y, available_pieces, 'a');
+
+			return recursive_method (num_parts -1, x-1, y, available_pieces, playing_field, score);
 		}
-		if (isEmpty(x+1, y)) { /*Side b*/
-			return recursive_method (num_parts -1, x+1, y);
+		if (playing_field[x+1][y].seq[0] == -1) { /*Side b*/
+			score += checkMatch (playing_field[x][y], x+1, y, available_pieces, 'b');
+			return recursive_method (num_parts -1, x+1, y, available_pieces, playing_field, score);
 		}
-		if (x % 2 == y % 2 && isEmpty(x, y+1)) {
-			return recursive_method (num_parts -1, x, y+1);
-		} else if (x % 2 != y % 2 && isEmpty(x, y-1)) {
-			return recursive_method (num_parts -1, x, y-1);
+		if (x % 2 == y % 2 && playing_field[x][y+1].seq[0] == -1) { /*Side c*/
+			score += checkMatch (playing_field[x][y], x, y+1, available_pieces, 'c');
+			return recursive_method (num_parts -1, x, y+1, available_pieces, playing_field, score);
+		} else if (x % 2 != y % 2 && playing_field[x][y-1].seq[0] == -1) {
+			score += checkMatch (playing_field[x][y], x, y-1, available_pieces, 'c');
+			return recursive_method (num_parts -1, x, y-1, available_pieces, playing_field, score);
 		} else {
-			return score;
+			scores[i] = score;
+			i++;
+			return i;
 		}
 	}
 }
 
 /*method that checks any possible neighbour to put on field*/
-int checkMatch(Piece* myPiece){
-
-
-
+int checkMatch(Piece myPiece, int x, int y, Piece* available_pieces, char myPieceSide){
+	int i, score = 0;
 	/*testar todas as combinações com peças disponiveis ainda para jogar*/
+	for ( i = 0; i < num_parts; i++) {
+		if (available_pieces[i].seq[0] != -1) {
+			/*se emparelhar com o lado a da minha peça...*/
+			if (myPieceSide == 'a') {
+				if ((myPiece.a.first == available_pieces[i].a.first && myPiece.a.second == available_pieces[i].a.second) || (myPiece.a.first == available_pieces[i].b.first && myPiece.a.second == available_pieces[i].b.second) || (myPiece.a.first == available_pieces[i].c.first && myPiece.a.second == available_pieces[i].c.second)){
+					score = myPiece.a.first + myPiece.a.second;
+					break;
+				}
+				/*se emparelhar com o lado b da minha peça...*/
+			} else if (myPieceSide == 'b') {
+				if ((myPiece.b.first == available_pieces[i].a.first && myPiece.b.second == available_pieces[i].a.second) || (myPiece.b.first == available_pieces[i].b.first && myPiece.b.second == available_pieces[i].b.second) || (myPiece.b.first == available_pieces[i].c.first && myPiece.b.second == available_pieces[i].c.second)){
+					score = myPiece.b.first + myPiece.b.second;
+					break;
+				}
+				/*se emparelhar com o lado c da minha peça...*/
+			} else {
+				if ((myPiece.c.first == available_pieces[i].a.first && myPiece.c.second == available_pieces[i].a.second) || (myPiece.c.first == available_pieces[i].b.first && myPiece.c.second == available_pieces[i].b.second) || (myPiece.c.first == available_pieces[i].c.first && myPiece.c.second == available_pieces[i].c.second)){
+					score = myPiece.c.first + myPiece.c.second;
+					break;
+				}
+			}
+		}
+	}
 
-	/*coloca no tabuleiro o vizinho escolhido
-	putOnPosition (x, y+1, neighbour);*/
+	/*coloca no tabuleiro o vizinho escolhido e torna indisponivel a peça para voltar a jogar*/
+	putOnPosition (x, y, available_pieces, i);
 
-	return 0;
+	return score;
 }
 
 
@@ -104,27 +145,15 @@ void rotate_piece (Piece * my_piece){
 	return;
 }
 
-/* checks if two sides of different pieces matches*/
-int sideMatches (Side pieceSide, Side neighbourSide) {
-	if (pieceSide.first == neighbourSide.first && pieceSide.second == neighbourSide.second){
-		return pieceSide.first + pieceSide.second;
-	}
-	return 0;
-}
-
-/*checks if position is empty*/
-int isEmpty (int x, int y) {
-	if(playing_field[x][y].seq[0] == -1)
-		return 1;
-	else
-		return 0;
-}
-
 /*put piece on the field*/
-void putOnPosition (int x, int y, Piece myPiece) {
-	playing_field[x][y].seq[0] = myPiece.seq[0];
-	playing_field[x][y].seq[1] = myPiece.seq[1];
-	playing_field[x][y].seq[2] = myPiece.seq[2];
+void putOnPosition (int x, int y, Piece* available_pieces, int index) {
+	playing_field[x][y].seq[0] = available_pieces[index].seq[0];
+	playing_field[x][y].seq[1] = available_pieces[index].seq[1];
+	playing_field[x][y].seq[2] = available_pieces[index].seq[2];
+	/*peça deixa de estar disponível*/
+	available_pieces[index].seq[0] = -1;
+	available_pieces[index].seq[1] = -1;
+	available_pieces[index].seq[2] = -1;
 	return;
 }
 
