@@ -54,9 +54,8 @@ int main(int argc, char const *argv[]) {
 	/*coloca a primeira peça no centro*/
 	putOnPosition ((MAX_PIECES*2)/2, (MAX_PIECES*2)/2, available_pieces, 0, playing_field);
 
-	/* imprimir tabuleiro
+	/* imprimir tabuleiro*/
 	printField(playing_field);
-	*/
 
 	length = recursive_method(num_parts-1, (MAX_PIECES*2)/2, (MAX_PIECES*2)/2, available_pieces, playing_field, score);
 
