@@ -69,7 +69,7 @@ int main(int argc, char const *argv[]) {
 		}
 	}
 
-	printf("%d\n", maxValue);
+	printf("SCORE IGUAL A: 	%d\n", maxValue);
 	return 0;
 }
 
@@ -88,21 +88,6 @@ void recursive_method (int num_parts, int x, int y, Piece available_pieces[], Pi
 				recursive_method (num_parts -1, x-1, y, available_pieces, playing_field, score);
 			}
 		}
-
-		if (playing_field[x+1][y].seq[0] == -1) {  /*COMEÇAR A PREENCHER À DIREITA*/
-			if (checkMatch (&playing_field[x][y], x+1, y, available_pieces, 'd', &score, playing_field, rotation, availablePieceIndex) != -404){
-				recursive_method (num_parts -1, x+1, y, available_pieces, playing_field, score);
-			}
-		}
-		if (x % 2 != y % 2 && playing_field[x][y+1].seq[0] == -1) { /*COMEÇAR A PREENCHER ACIMA*/
-			if (checkMatch (&playing_field[x][y], x, y+1, available_pieces, 'c', &score, playing_field, rotation, availablePieceIndex) != -404){
-				recursive_method (num_parts -1, x, y+1, available_pieces, playing_field, score);
-			}
-		} else if (x % 2 == y % 2 && playing_field[x][y-1].seq[0] == -1) {  /*COMEÇAR A PREENCHER ABAIXO*/
-			if (checkMatch (&playing_field[x][y], x, y-1, available_pieces, 'b', &score, playing_field, rotation, availablePieceIndex) != -404){
-				recursive_method (num_parts -1, x, y-1, available_pieces, playing_field, score);
-			}
-		}
 	}
 }
 
@@ -112,101 +97,39 @@ int checkMatch(Piece* myPiece, int x, int y, Piece available_pieces[], char inse
 	int foundPiece = 0;
 
 	/*testar todas as combinações com peças disponiveis ainda para jogar*/
-	for ( z = availablePieceIndex +1; z < num_parts; ++z) {
+	for ( z = availablePieceIndex; z < num_parts; ++z) {
 		/*se a peça ainda nao tiver no tabuleiro*/
 		if (available_pieces[z].seq[0] != -1) {
 			if (insertOrientation == 'e') {
 
-				if (x % 2 == y % 2) { /*INSERIR PEÇA VOLTADA PARA CIMA*/
-					for (o = rotation + 1; o < 2; o++) {	/*NO MAXIMO RODO 2 VEZES*/
-						/*EMPARELHAR O LADO C DA MINHA PEÇA COM O LADO B DA PEÇA NOVA*/
-						if (!(myPiece->seq[c.firstIndex] == available_pieces[z].seq[b.secondIndex] && myPiece->seq[c.secondIndex] == available_pieces[z].seq[b.firstIndex])) {
-							rotate_piece(&available_pieces[z]);
-						} else {
-							/*volta se a chamar recursivamente se ainda houver rotações por experimentar*/
-							checkMatch(myPiece, x, y, available_pieces, insertOrientation, score, playing_field, o, z);
-							score += myPiece->seq[c.firstIndex] + myPiece->seq[c.secondIndex];
-							foundRotation = 1;
-							break;
-						}
-					}
-				} else { /*INSERIR PEÇA VOLTADA PARA BAIXO*/
-					for (o = rotation; o < 2; o++) {
-						/*EMPARELHAR O LADO A DA MINHA PEÇA COM O LADO B DA PEÇA NOVA*/
-						if (!(myPiece->seq[a.firstIndex] == available_pieces[z].seq[b.secondIndex] && myPiece->seq[a.secondIndex] == available_pieces[z].seq[b.firstIndex])) {
-							rotate_piece(&available_pieces[z]);
-						} else {
-							/*volta se a chamar recursivamente se ainda houver rotações por experimentar*/
-							checkMatch(myPiece, x, y, available_pieces, insertOrientation, score, playing_field, o, z);
-							score += myPiece->seq[a.firstIndex] + myPiece->seq[a.secondIndex];
-							foundRotation = 1;
-							break;
-						}
-					}
+				if (myPiece->seq[a.firstIndex] == available_pieces[z].seq[b.secondIndex] && myPiece->seq[a.secondIndex] == available_pieces[z].seq[b.firstIndex]) {
+					printf("ENCONTREI NO LADO ESQUERDO 1\n" );
+					/*volta se a chamar recursivamente se ainda houver rotações por experimentar*/
+					checkMatch(myPiece, x, y, available_pieces, insertOrientation, score, playing_field, o + 1, z);
+					score += myPiece->seq[a.firstIndex] + myPiece->seq[a.secondIndex];
+					foundRotation = 1;
 				}
 
-			} else if (insertOrientation == 'd') {
-
-				if (x % 2 == y % 2) { /*INSERIR PEÇA VOLTADA PARA CIMA*/
-					for (o = rotation; o < 2; o++) {	/*NO MAXIMO RODO 2 VEZES*/
-						/*EMPARELHAR O LADO B DA MINHA PEÇA COM O LADO A DA PEÇA NOVA*/
-						if (!(myPiece->seq[b.firstIndex] == available_pieces[z].seq[a.secondIndex] && myPiece->seq[b.secondIndex] == available_pieces[z].seq[a.firstIndex])) {
-							rotate_piece(&available_pieces[z]);
-						} else {
-							/*volta se a chamar recursivamente se ainda houver rotações por experimentar*/
-							checkMatch(myPiece, x, y, available_pieces, insertOrientation, score, playing_field, o, z);
-							score += myPiece->seq[b.firstIndex] + myPiece->seq[b.secondIndex];
-							foundRotation = 1;
-							break;
-						}
-					}
-				} else { /*INSERIR PEÇA VOLTADA PARA BAIXO*/
-					for (o = rotation; o < 2; o++) {
-						/*EMPARELHAR O LADO B DA MINHA PEÇA COM O LADO C DA PEÇA NOVA*/
-						if (!(myPiece->seq[b.firstIndex] == available_pieces[z].seq[c.secondIndex] && myPiece->seq[b.secondIndex] == available_pieces[z].seq[c.firstIndex])) {
-							rotate_piece(&available_pieces[z]);
-						} else {
-							/*volta se a chamar recursivamente se ainda houver rotações por experimentar*/
-							checkMatch(myPiece, x, y, available_pieces, insertOrientation, score, playing_field, o, z);
-							score += myPiece->seq[b.firstIndex] + myPiece->seq[b.secondIndex];
-							foundRotation = 1;
-							break;
-						}
-					}
-				}
-
-			} else if (insertOrientation == 'c') { /*INSERIR PEÇA VOLTADA PARA CIMA*/
-				for (o = rotation; o < 2; o++) {	/*NO MAXIMO RODO 2 VEZES*/
-					/*EMPARELHAR O LADO A DA MINHA PEÇA COM O LADO C DA PEÇA NOVA*/
-					if (!(myPiece->seq[a.firstIndex] == available_pieces[z].seq[c.secondIndex] && myPiece->seq[a.secondIndex] == available_pieces[z].seq[c.firstIndex])) {
-						rotate_piece(&available_pieces[z]);
-					} else {
+				for (o = rotation; o < 2; o++) {
+					printf("ENCONTREI NO LADO ESQUERDO 2\n" );
+					rotate_piece(&available_pieces[z]);
+					/*EMPARELHAR O LADO A DA MINHA PEÇA COM O LADO B DA PEÇA NOVA*/
+					if (myPiece->seq[a.firstIndex] == available_pieces[z].seq[b.secondIndex] && myPiece->seq[a.secondIndex] == available_pieces[z].seq[b.firstIndex]) {
 						/*volta se a chamar recursivamente se ainda houver rotações por experimentar*/
-						checkMatch(myPiece, x, y, available_pieces, insertOrientation, score, playing_field, o, z);
+						checkMatch(myPiece, x, y, available_pieces, insertOrientation, score, playing_field, o + 1, z);
 						score += myPiece->seq[a.firstIndex] + myPiece->seq[a.secondIndex];
 						foundRotation = 1;
-						break;
 					}
-				}
-			} else { /*INSERIR PEÇA VOLTADA PARA BAIXO*/
-				for (o = rotation; o < 2; o++) {	/*NO MAXIMO RODO 2 VEZES*/
-					/*EMPARELHAR O LADO C DA MINHA PEÇA COM O LADO A DA PEÇA NOVA*/
-					if (!(myPiece->seq[c.firstIndex] == available_pieces[z].seq[a.secondIndex] && myPiece->seq[c.secondIndex] == available_pieces[z].seq[a.firstIndex])) {
-						rotate_piece(&available_pieces[z]);
-					} else {
-						/*volta se a chamar recursivamente se ainda houver rotações por experimentar*/
-						checkMatch(myPiece, x, y, available_pieces, insertOrientation, score, playing_field, o, z);
-						score += myPiece->seq[c.firstIndex] + myPiece->seq[c.secondIndex];
-						foundRotation = 1;
-						break;
-					}
+
+					printf("EU RODO A PEÇA CERTO????\n");
+
 				}
 			}
 			if (foundRotation == 1) {
 				foundPiece = 1;
 				/*SE ENCONTROU UMA POSIÇÃO DA PEÇA ADEQUADA, VAI VERIFICAR RECURSIVAMENTE A OUTRA A OUTRA ROTAÇÃO*/
 				putOnPosition (x, y, available_pieces, z, playing_field);
-				checkMatch(myPiece, x, y, available_pieces, insertOrientation, score, playing_field, o, z);
+				checkMatch(myPiece, x, y, available_pieces, insertOrientation, score, playing_field, o, z + 1);
 				return *score;
 			}
 
