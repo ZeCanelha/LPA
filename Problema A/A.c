@@ -20,7 +20,7 @@ struct Playing_field_coords {
 };
 
 int num_parts = 1, score = 0, scoreIndex = 0;
-int z, o, l, length;
+int z, o, l;
 int scores[200]; /*isto nao esta muito bem assim mas q safoda por agr*/
 
 /*cada peça voltada para cima tem de ter 3 vizinhos voltados para baixo e vice versa*/
@@ -31,7 +31,7 @@ int isEmpty (int x, int y);
 void printField (Piece (* playing_field)[MAX_PIECES*2]);
 void establishSides();
 void putOnPosition (int x, int y, Piece* available_pieces, int index, Piece (* playing_field)[MAX_PIECES*2]);
-int recursive_method (int num_parts, int x, int y, Piece available_pieces[], Piece playing_field[MAX_PIECES*2][MAX_PIECES*2], int score);
+void recursive_method (int num_parts, int x, int y, Piece available_pieces[], Piece playing_field[MAX_PIECES*2][MAX_PIECES*2], int score);
 int checkMatch(Piece* myPiece, int x, int y, Piece available_pieces[], char insertOrientation, int* score, Piece playing_field[MAX_PIECES*2][MAX_PIECES*2], int rotation, int availablePieceIndex);
 
 /*FUNCTIONS ---------------------------------------------------------------------*/
@@ -52,16 +52,16 @@ int main(int argc, char const *argv[]) {
 	}
 
 	/*coloca a primeira peça no centro*/
-	putOnPosition ((MAX_PIECES*2)/2, (MAX_PIECES*2)/2, available_pieces, 0, playing_field);
+	putOnPosition (MAX_PIECES, MAX_PIECES, available_pieces, 0, playing_field);
 
 	/* imprimir tabuleiro*/
 	printField(playing_field);
 
-	length = recursive_method(num_parts-1, (MAX_PIECES*2)/2, (MAX_PIECES*2)/2, available_pieces, playing_field, score);
+	recursive_method(num_parts-1, MAX_PIECES, MAX_PIECES, available_pieces, playing_field, score);
 
 	/*find max score*/
 	int maxValue = scores[0];
-	for (l = 0; l < length; ++l) {
+	for (l = 0; l < scoreIndex; ++l) {
 		if ( scores[l] > maxValue ) {
 		 	maxValue = scores[l];
 		} else if (scores[l] == -1) {
@@ -73,13 +73,14 @@ int main(int argc, char const *argv[]) {
 	return 0;
 }
 
-int recursive_method (int num_parts, int x, int y, Piece available_pieces[], Piece playing_field[MAX_PIECES*2][MAX_PIECES*2], int score) {
+void recursive_method (int num_parts, int x, int y, Piece available_pieces[], Piece playing_field[MAX_PIECES*2][MAX_PIECES*2], int score) {
 	/*cada vez que se invoca o metodo recursivo uma copia do tabuleiro e das peças disponiveis tem que ser guardada*/
-	int rotation = 0, availablePieceIndex = 1;
+	int rotation = 0, availablePieceIndex = 0;
+
 	if (num_parts == 0){
 		scores[scoreIndex] = score;
 		scoreIndex++;
-		return scoreIndex;
+		return;
 	} else {
 		if (playing_field[x-1][y].seq[0] == -1){ 	/*COMEÇAR A PREENCHER À ESQUERDA*/
 			if (checkMatch (&playing_field[x][y], x-1, y, available_pieces, 'e', &score, playing_field, rotation, availablePieceIndex) != -404){
@@ -87,32 +88,29 @@ int recursive_method (int num_parts, int x, int y, Piece available_pieces[], Pie
 				recursive_method (num_parts -1, x-1, y, available_pieces, playing_field, score);
 			}
 		}
+
 		if (playing_field[x+1][y].seq[0] == -1) {  /*COMEÇAR A PREENCHER À DIREITA*/
 			if (checkMatch (&playing_field[x][y], x+1, y, available_pieces, 'd', &score, playing_field, rotation, availablePieceIndex) != -404){
 				recursive_method (num_parts -1, x+1, y, available_pieces, playing_field, score);
 			}
 		}
-		if (x % 2 == y % 2 && playing_field[x][y+1].seq[0] == -1) { /*COMEÇAR A PREENCHER ACIMA*/
+		if (x % 2 != y % 2 && playing_field[x][y+1].seq[0] == -1) { /*COMEÇAR A PREENCHER ACIMA*/
 			if (checkMatch (&playing_field[x][y], x, y+1, available_pieces, 'c', &score, playing_field, rotation, availablePieceIndex) != -404){
 				recursive_method (num_parts -1, x, y+1, available_pieces, playing_field, score);
 			}
-		} else if (x % 2 != y % 2 && playing_field[x][y-1].seq[0] == -1) {  /*COMEÇAR A PREENCHER ABAIXO*/
+		} else if (x % 2 == y % 2 && playing_field[x][y-1].seq[0] == -1) {  /*COMEÇAR A PREENCHER ABAIXO*/
 			if (checkMatch (&playing_field[x][y], x, y-1, available_pieces, 'b', &score, playing_field, rotation, availablePieceIndex) != -404){
 				recursive_method (num_parts -1, x, y-1, available_pieces, playing_field, score);
 			}
-		} else {
-			scores[scoreIndex] = score;
-			scoreIndex++;
-			return scoreIndex;
 		}
 	}
-	return scoreIndex;
 }
 
 /*method that checks any possible neighbour to put on field*/
 int checkMatch(Piece* myPiece, int x, int y, Piece available_pieces[], char insertOrientation, int* score, Piece playing_field[MAX_PIECES*2][MAX_PIECES*2], int rotation, int availablePieceIndex) {
 	int foundRotation = 0;
 	int foundPiece = 0;
+
 	/*testar todas as combinações com peças disponiveis ainda para jogar*/
 	for ( z = availablePieceIndex +1; z < num_parts; ++z) {
 		/*se a peça ainda nao tiver no tabuleiro*/
@@ -216,6 +214,7 @@ int checkMatch(Piece* myPiece, int x, int y, Piece available_pieces[], char inse
 	}
 	/*SE ENCONTROU UMA PEÇA ADEQUADA*/
 	if (foundPiece == 1) {
+		putOnPosition (x, y, available_pieces, z, playing_field);
 		return *score;
 	} else {
 		/*NAO ENCONTROU NENHUMA PEÇA ADEQUADA*/
