@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_PIECES 3
+#define MAX_PIECES 2
 
 /* STRUCTS AND CONSTANTS ------------------------------------------------------------*/
 typedef struct {
@@ -28,7 +28,7 @@ int num_partsCopy = 0; /*TODO:isto provavelmente vai ser mudado*/
 int num_parts = 1, score = 0, scoreIndex = 0;
 int availablePieceIndex = 1, matchScore = 0;
 int z, 	o, l;
-int scores[200]; /*TODO:isto nao esta muito bem assim mas q safoda por agr*/
+int scores[200] = {0}; /*TODO:isto nao esta muito bem assim mas q safoda por agr*/
 
 /*cada peça voltada para cima tem de ter 3 vizinhos voltados para baixo e vice versa*/
 
@@ -52,7 +52,6 @@ int main(int argc, char const *argv[]) {
 
 	/*in the begining everything is empty -1*/
 	memset (playing_field.matrix, -1, sizeof(playing_field.matrix));
-	memset (scores, -1, sizeof(scores));
 
 	while(scanf("%d %d %d",&available_pieces.array[num_parts - 1].seq[0], &available_pieces.array[num_parts - 1].seq[1],&available_pieces.array[num_parts - 1].seq[2]) != EOF && num_parts < MAX_PIECES ) {
 		available_pieces.array[num_parts - 1].rotation = 0;
@@ -64,18 +63,14 @@ int main(int argc, char const *argv[]) {
 	/*coloca a primeira peça no centro*/
 	playing_field.matrix[MAX_PIECES].array[MAX_PIECES] = available_pieces.array[0];
 
-	/* imprimir tabuleiro*/
-	printField(playing_field);
-
 	recursive_method(num_parts, MAX_PIECES, MAX_PIECES, available_pieces, playing_field, score);
 
 	/*find max score*/
 	int maxValue = scores[0];
 	for (l = 0; l < scoreIndex; ++l) {
+		printf("SCORE POSSÍVEL: %d\n", scores[l] );
 		if ( scores[l] > maxValue ) {
 		 	maxValue = scores[l];
-		} else if (scores[l] == -1) {
-			break;
 		}
 	}
 
@@ -88,51 +83,48 @@ void recursive_method (int num_parts, int x, int y, ArrayPieces available_pieces
 
 	int newScore = 0;
 	MatrixPieces newPlayingField = playing_field;
-	ArrayPieces newAvailablePieces;
-
+	ArrayPieces newAvailablePieces = available_pieces;
 
 	if (num_parts == 1 /*TODO:ou ja nao houver match de peça nenhuma*/){
 		scores[scoreIndex] = score;
 		scoreIndex++;
 		return;
 	} else {
+
 		if (playing_field.matrix[x].array[y-1].seq[0] == -1){ 	/*COMEÇAR A PREENCHER À ESQUERDA*/
 			for (z= 1; z < num_partsCopy; z++) {/*testar todas as combinações com peças disponiveis ainda para jogar - TODO:OTIMIZAR ISTO PORQUE ITERATIVAMENTE DEMORA MUITO TEMPO*/
-
+				
 				if (available_pieces.array[z].seq[0] != -1) {
 
 					for (l=0; l < 3; l++) { /*NO MAXIMO RODA 2 VEZES*/
+
 						/*EMPARELHAR O LADO A DA MINHA PEÇA COM O LADO B DA PEÇA NOVA*/
 						if (playing_field.matrix[x].array[y].seq[a.firstIndex] == available_pieces.array[z].seq[b.secondIndex] && playing_field.matrix[x].array[y].seq[a.secondIndex] == available_pieces.array[z].seq[b.firstIndex]) {
 
+							/*ACUMULA O SCORE*/
 							newScore = score + playing_field.matrix[x].array[y].seq[a.firstIndex] + playing_field.matrix[x].array[y].seq[a.secondIndex];
 
+							/*COLOCA A PEÇA DE NOVO NO TABULEIRO*/
 							newPlayingField.matrix[x].array[y-1] = available_pieces.array[z];
-
-							/*peça deixa de estar disponível*/
-							newAvailablePieces = disablePiece (available_pieces, z);
 							printField(newPlayingField);
+							/*PEÇA DEIXA DE ESTAR DISPONIVEL*/
+							newAvailablePieces.array[z].seq[0] = -1;
+							printf("FIZ RECURSAO\n" );
 							recursive_method (num_parts-1, x, y-1, newAvailablePieces, newPlayingField, newScore);
 
 							/*TODO: SE SOBRAR APENAS UMA PEÇA, TESTA LOGO SE A PODE COLOCAR OU NAO EM VEZ DE ESTAR A CHAMAR RECURSIVAMENTE OUTRA VEZ*/
 
-							/*uma peça nao pode ter 2 lados que encaixem num lado de outra peça portanto podemos sair logo*/
-							break;
+							break; /*uma peça nao pode ter 2 lados que encaixem num lado de outra peça portanto podemos sair logo*/
+
 						} else {
+							/*SO RODA A PEÇA SE NÂO HOUVER MATCH DE UM LADO*/
 							rotate_piece(&available_pieces.array[z]);
 						}
 					}
-
 				}
-
 			}
 		}
 	}
-}
-
-ArrayPieces disablePiece (ArrayPieces available_pieces, int index) {
-	available_pieces.array[z].seq[0] = -1;
-	return available_pieces;
 }
 
 /*method that rotates a piece one time*/
