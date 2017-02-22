@@ -54,6 +54,7 @@ int main(int argc, char const *argv[]) {
 
 	/*in the begining everything is empty -1*/
 	memset (playing_field.matrix, -1, sizeof(playing_field.matrix));
+	memset (available_pieces.array, -1, sizeof(available_pieces.array));
 
 	while(scanf("%d %d %d",&available_pieces.array[num_parts - 1].seq[0], &available_pieces.array[num_parts - 1].seq[1],&available_pieces.array[num_parts - 1].seq[2]) != EOF && num_parts < MAX_PIECES ) {
 		available_pieces.array[num_parts - 1].rotation = 0;
@@ -95,16 +96,16 @@ void recursive_method (int num_parts, int x, int y, ArrayPieces available_pieces
 	ArrayPieces newAvailablePieces;
 
 	if (num_parts == 1 /*TODO:ou ja nao houver match de peça nenhuma*/){
-		printf("<Boas><Sai da recursão + %d>\n", conta);
+
 		scores[scoreIndex] = score;
 		scoreIndex++;
 		return;
 	} else {
 
 		if (playing_field.matrix[x].array[y-1].seq[0] == -1){ 	/*COMEÇAR A PREENCHER À ESQUERDA*/
-			printf("<Boas><Recursão + %d>\n",conta++);
+
 			for (z = 1; z < num_partsCopy; z++) {/*testar todas as combinações com peças disponiveis ainda para jogar - TODO:OTIMIZAR ISTO PORQUE ITERATIVAMENTE DEMORA MUITO TEMPO*/
-				printf("<Peças><%d>\n",z);
+
 				if (available_pieces.array[z].seq[0] != -1) {
 
 					for (l=0; l < 3; l++) { /*NO MAXIMO RODA 2 VEZES*/
