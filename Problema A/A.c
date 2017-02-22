@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_PIECES 3
+#define MAX_PIECES 7
 
 /* STRUCTS AND CONSTANTS ------------------------------------------------------------*/
 typedef struct {
@@ -105,13 +105,15 @@ void recursive_method (int num_parts, int x, int y, ArrayPieces available_pieces
 
 					for (l=0; l < 3; l++) { /*NO MAXIMO RODA 2 VEZES*/
 
-						if (x%2 == y%2) { /*PEÇA VIRADA PARA CIMA*/
-							
+						/*PEÇA VIRADA PARA CIMA*/
+						if (x%2 == y%2) {
 							/*EMPARELHAR O LADO A DA MINHA PEÇA COM O LADO B DA PEÇA NOVA*/
 							matched = (playing_field.matrix[x].array[y].seq[a.firstIndex] == available_pieces.array[z].seq[b.secondIndex]) && (playing_field.matrix[x].array[y].seq[a.secondIndex] == available_pieces.array[z].seq[b.firstIndex]);
-						} else { /*PEÇA VIRADA PARA BAIXO*/
-							/*EMPARELHAR O LADO A DA MINHA PEÇA COM O LADO B DA PEÇA NOVA*/
-							matched = (playing_field.matrix[x].array[y].seq[c.firstIndex] == available_pieces.array[z].seq[b.secondIndex]) && (playing_field.matrix[x].array[y].seq[c.secondIndex] == available_pieces.array[z].seq[b.firstIndex]);
+
+						/*PEÇA VIRADA PARA BAIXO*/
+						} else {
+							/*EMPARELHAR O LADO C DA MINHA PEÇA COM O LADO B DA PEÇA NOVA*/
+							matched = (playing_field.matrix[x].array[y].seq[c.firstIndex] == available_pieces.array[z].seq[b.firstIndex]) && (playing_field.matrix[x].array[y].seq[c.secondIndex] == available_pieces.array[z].seq[b.secondIndex]);
 						}
 
 						if (matched) {
@@ -227,4 +229,13 @@ void printField (MatrixPieces playing_field) {
 		printf("\n");
 	}
 	printf("\n\n");
+}
+
+void establishSides() {
+	a.firstIndex = 0;
+	a.secondIndex = 1;
+	b.firstIndex = 1;
+	b.secondIndex = 2;
+	c.firstIndex = 0;
+	c.secondIndex = 2;
 }
