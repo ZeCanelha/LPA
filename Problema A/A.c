@@ -24,10 +24,12 @@ typedef struct {
 	ArrayPieces matrix[MAX_PIECES*2];
 } MatrixPieces;
 
+int conta = 0;
+
 int num_partsCopy = 0; /*TODO:isto provavelmente vai ser mudado*/
 int num_parts = 1, score = 0, scoreIndex = 0;
 int availablePieceIndex = 1, matchScore = 0;
-int z, 	o, l;
+int o;
 int scores[200] = {0}; /*TODO:isto nao esta muito bem assim mas q safoda por agr*/
 
 /*cada peça voltada para cima tem de ter 3 vizinhos voltados para baixo e vice versa*/
@@ -54,11 +56,9 @@ int main(int argc, char const *argv[]) {
 	memset (playing_field.matrix, -1, sizeof(playing_field.matrix));
 
 	while(scanf("%d %d %d",&available_pieces.array[num_parts - 1].seq[0], &available_pieces.array[num_parts - 1].seq[1],&available_pieces.array[num_parts - 1].seq[2]) != EOF && num_parts < MAX_PIECES ) {
-		available_pieces.array[num_parts - 1].rotation = 0;
 		num_parts++;
 	}
 	num_partsCopy = num_parts;
-	available_pieces.array[num_parts - 1].rotation = 0;
 
 	/*coloca a primeira peça no centro*/
 	playing_field.matrix[MAX_PIECES].array[MAX_PIECES] = available_pieces.array[0];
@@ -80,21 +80,29 @@ int main(int argc, char const *argv[]) {
 
 void recursive_method (int num_parts, int x, int y, ArrayPieces available_pieces, MatrixPieces playing_field, int score) {
 	/*cada vez que se invoca o metodo recursivo uma copia do tabuleiro e das peças disponiveis tem que ser guardada*/
-
+	int i = 0;
+	for ( i = 0; i < sizeof(available_pieces.array)/sizeof(Piece); i++ )
+	{
+		printf("%d %d %d\n",available_pieces.array[i].seq[0],available_pieces.array[i].seq[2],available_pieces.array[i].seq[2]);
+	}
 	int newScore = 0;
 	int matched = 0;
-	MatrixPieces newPlayingField = playing_field;
-	ArrayPieces newAvailablePieces = available_pieces;
+	int z = 1;
+	int l = 0;
+	MatrixPieces newPlayingField;
+	ArrayPieces newAvailablePieces;
 
 	if (num_parts == 1 /*TODO:ou ja nao houver match de peça nenhuma*/){
+		printf("<Boas><Sai da recursão + %d>\n", conta);
 		scores[scoreIndex] = score;
 		scoreIndex++;
 		return;
 	} else {
 
 		if (playing_field.matrix[x].array[y-1].seq[0] == -1){ 	/*COMEÇAR A PREENCHER À ESQUERDA*/
-			for (z= 1; z < num_partsCopy; z++) {/*testar todas as combinações com peças disponiveis ainda para jogar - TODO:OTIMIZAR ISTO PORQUE ITERATIVAMENTE DEMORA MUITO TEMPO*/
-
+			printf("<Boas><Recursão + %d>\n",conta++);
+			for (z = 1; z < num_partsCopy; z++) {/*testar todas as combinações com peças disponiveis ainda para jogar - TODO:OTIMIZAR ISTO PORQUE ITERATIVAMENTE DEMORA MUITO TEMPO*/
+				printf("<Peças><%d>\n",z);
 				if (available_pieces.array[z].seq[0] != -1) {
 
 					for (l=0; l < 3; l++) { /*NO MAXIMO RODA 2 VEZES*/
@@ -110,9 +118,12 @@ void recursive_method (int num_parts, int x, int y, ArrayPieces available_pieces
 						if (matched) {
 							/*ACUMULA O SCORE*/
 							newScore = score + playing_field.matrix[x].array[y].seq[a.firstIndex] + playing_field.matrix[x].array[y].seq[a.secondIndex];
-
+							newPlayingField = playing_field;
 							/*COLOCA A PEÇA DE NOVO NO TABULEIRO*/
 							newPlayingField.matrix[x].array[y-1] = available_pieces.array[z];
+
+							newAvailablePieces = available_pieces;
+
 							/*PEÇA DEIXA DE ESTAR DISPONIVEL*/
 							newAvailablePieces.array[z].seq[0] = -1;
 							printf("FIZ RECURSAO\n" );
