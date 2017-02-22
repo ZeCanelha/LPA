@@ -29,7 +29,7 @@ int conta = 0;
 int num_partsCopy = 0; /*TODO:isto provavelmente vai ser mudado*/
 int num_parts = 1, score = 0, scoreIndex = 0;
 int availablePieceIndex = 1, matchScore = 0;
-int o;
+int z, 	o, l;
 int scores[200] = {0}; /*TODO:isto nao esta muito bem assim mas q safoda por agr*/
 
 /*cada peça voltada para cima tem de ter 3 vizinhos voltados para baixo e vice versa*/
@@ -56,9 +56,11 @@ int main(int argc, char const *argv[]) {
 	memset (playing_field.matrix, -1, sizeof(playing_field.matrix));
 
 	while(scanf("%d %d %d",&available_pieces.array[num_parts - 1].seq[0], &available_pieces.array[num_parts - 1].seq[1],&available_pieces.array[num_parts - 1].seq[2]) != EOF && num_parts < MAX_PIECES ) {
+		available_pieces.array[num_parts - 1].rotation = 0;
 		num_parts++;
 	}
 	num_partsCopy = num_parts;
+	available_pieces.array[num_parts - 1].rotation = 0;
 
 	/*coloca a primeira peça no centro*/
 	playing_field.matrix[MAX_PIECES].array[MAX_PIECES] = available_pieces.array[0];
