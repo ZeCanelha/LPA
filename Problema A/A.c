@@ -29,7 +29,7 @@ int conta = 0;
 int num_partsCopy = 0; /*TODO:isto provavelmente vai ser mudado*/
 int num_parts = 1, score = 0, scoreIndex = 0;
 int availablePieceIndex = 1, matchScore = 0;
-int scores[200] = {0}; /*TODO:isto nao esta muito bem assim mas q safoda por agr*/
+long scores[100000] = {0}; /*TODO:isto nao esta muito bem assim mas q safoda por agr*/
 
 /*TODO: temos que fazer e desfazer o tabuleiro e as available_pieces em vez de passar copias*/
 /*TODO: RESOLVER SITUAÇÃO EM Q APARECEM BURACOS*/
@@ -47,7 +47,7 @@ ArrayPieces disablePiece (ArrayPieces available_pieces, int index);
 
 /*FUNCTIONS ---------------------------------------------------------------------*/
 int main(int argc, char const *argv[]) {
-	int l;
+	int l, im;
 	MatrixPieces playing_field;
 	ArrayPieces available_pieces;
 
@@ -63,21 +63,25 @@ int main(int argc, char const *argv[]) {
 	}
 	num_partsCopy = num_parts;
 
-	/*coloca a primeira peça no centro*/
-	playing_field.matrix[MAX_PIECES].array[MAX_PIECES] = available_pieces.array[0];
+	for (im = 0; im < num_partsCopy; im++) {
 
-	recursive_method(num_parts, MAX_PIECES, MAX_PIECES, available_pieces, playing_field, score);
+		/*coloca a primeira peça no centro*/
+	
+		playing_field.matrix[MAX_PIECES].array[MAX_PIECES] = available_pieces.array[im];
+		recursive_method(num_parts, MAX_PIECES, MAX_PIECES, available_pieces, playing_field, score);
+	}
+
 
 	/*find max score*/
-	int maxValue = scores[0];
+	long maxValue = scores[0];
 	for (l = 0; l < scoreIndex; ++l) {
-		printf("SCORE POSSÍVEL: %d\n", scores[l] );
+		printf("SCORE POSSÍVEL: %ld\n", scores[l] );
 		if ( scores[l] > maxValue ) {
 		 	maxValue = scores[l];
 		}
 	}
 
-	printf("SCORE IGUAL A: 	%d\n", maxValue);
+	printf("SCORE IGUAL A: 	%ld\n", maxValue);
 	return 0;
 }
 
