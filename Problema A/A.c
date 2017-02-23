@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_PIECES 3
+#define MAX_PIECES 20
 
 /* STRUCTS AND CONSTANTS ------------------------------------------------------------*/
 typedef struct {
@@ -24,12 +24,10 @@ typedef struct {
 	ArrayPieces matrix[MAX_PIECES*2];
 } MatrixPieces;
 
-int conta = 0;
-
-int num_partsCopy = 0; /*TODO:isto provavelmente vai ser mudado*/
-int num_parts = 1, score = 0, scoreIndex = 0;
-int availablePieceIndex = 1, matchScore = 0;
-long scores[100000] = {0}; /*TODO:isto nao esta muito bem assim mas q safoda por agr*/
+int num_partsCopy = 0;
+int num_parts = 1;
+long maxValue = 0;
+long score = 0;
 
 /*TODO: temos que fazer e desfazer o tabuleiro e as available_pieces em vez de passar copias*/
 /*TODO: RESOLVER SITUAÇÃO EM Q APARECEM BURACOS*/
@@ -47,7 +45,7 @@ ArrayPieces disablePiece (ArrayPieces available_pieces, int index);
 
 /*FUNCTIONS ---------------------------------------------------------------------*/
 int main(int argc, char const *argv[]) {
-	int l, im;
+	int im;
 	MatrixPieces playing_field;
 	ArrayPieces available_pieces;
 
@@ -64,21 +62,10 @@ int main(int argc, char const *argv[]) {
 	num_partsCopy = num_parts;
 
 	for (im = 0; im < num_partsCopy; im++) {
-
 		/*coloca a primeira peça no centro*/
-	
 		playing_field.matrix[MAX_PIECES].array[MAX_PIECES] = available_pieces.array[im];
+
 		recursive_method(num_parts, MAX_PIECES, MAX_PIECES, available_pieces, playing_field, score);
-	}
-
-
-	/*find max score*/
-	long maxValue = scores[0];
-	for (l = 0; l < scoreIndex; ++l) {
-		printf("SCORE POSSÍVEL: %ld\n", scores[l] );
-		if ( scores[l] > maxValue ) {
-		 	maxValue = scores[l];
-		}
 	}
 
 	printf("SCORE IGUAL A: 	%ld\n", maxValue);
@@ -93,9 +80,9 @@ void recursive_method (int num_parts, int x, int y, ArrayPieces available_pieces
 
 	/*TODO:adicionar outro caso base: se ja nao houver match de peça nenhuma retorna logo sem registar score*/
 	if (num_parts == 1){
-
-		scores[scoreIndex] = score;
-		scoreIndex++;
+		if (score >= maxValue){
+			maxValue = score;
+		}
 		return;
 	} else {
 		/* TODO: METER O CODIGO QUE ESTÀ REPETIDO DENTRO DE CADA "IF" NUMA FUNCAO COM CERTOS PARAMETROS DE ENTRADA (eu depois faço isto que tem algumas manhas que eu ja sei) */
@@ -266,8 +253,9 @@ void recursive_method (int num_parts, int x, int y, ArrayPieces available_pieces
 			}
 		}
 		if(!matched){
-			scores[scoreIndex] = score;
-			scoreIndex++;
+			if (score >= maxValue){
+				maxValue = score;
+			}
 			return;
 		}
 
