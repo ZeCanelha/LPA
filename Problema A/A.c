@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_PIECES 3
+#define MAX_PIECES 6
 
 /* STRUCTS AND CONSTANTS ------------------------------------------------------------*/
 typedef struct {
@@ -90,7 +90,6 @@ void recursive_method (int num_parts, int x, int y, ArrayPieces available_pieces
 	ArrayPieces newAvailablePieces;
 
 	/*TODO:adicionar outro caso base: se ja nao houver match de peça nenhuma retorna logo sem registar score*/
-
 	if (num_parts == 1){
 		scores[scoreIndex] = score;
 		scoreIndex++;
@@ -218,6 +217,9 @@ void recursive_method (int num_parts, int x, int y, ArrayPieces available_pieces
 			}
 		}
 	}
+	scores[scoreIndex] = score;
+	scoreIndex++;
+	return;
 }
 
 /*method that rotates a piece one time*/
