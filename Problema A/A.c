@@ -1,8 +1,10 @@
+/*TODO: RESOLVER SITUAÇÃO EM Q APARECEM BURACOS*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
-#define MAX_PIECES 6
+#define MAX_PIECES 20
 
 /* STRUCTS AND CONSTANTS ------------------------------------------------------------*/
 typedef struct {
@@ -28,11 +30,6 @@ int num_partsCopy = 0;
 long maxValue = 0;
 long score = 0;
 
-/*TODO: temos que fazer e desfazer o tabuleiro e as available_pieces em vez de passar copias*/
-/*TODO: RESOLVER SITUAÇÃO EM Q APARECEM BURACOS*/
-
-/*cada peça voltada para cima tem de ter 3 vizinhos voltados para baixo e vice versa*/
-
 /* PROTOTYPES ---------------------------------------------------------------------*/
 void rotate_piece (Piece * my_piece);
 int isEmpty (int x, int y);
@@ -46,11 +43,13 @@ ArrayPieces deleteFromArray(ArrayPieces myArray, int position, int n);
 /*FUNCTIONS ---------------------------------------------------------------------*/
 int main(int argc, char const *argv[]) {
 	/* int im; */
-	int num_parts = 0, im, used_array_size = 1;
+	int num_parts = 0, used_array_size = 1;
 	MatrixPieces playing_field;
 	ArrayPieces available_pieces;
 	ArrayPieces used_pieces;
-	ArrayPieces newAvailablePieces5;
+	ArrayPieces newAvailablePieces;
+	clock_t begin, end;
+	double tempo;
 
 	/*inicializar indices de orientação das peças*/
 	establishSides();
@@ -71,25 +70,20 @@ int main(int argc, char const *argv[]) {
 	* TODO: Se actualizar aqui a lista das peças usadas estou sempre a passar um array com + 1 peço nova
 	* TODO: mxPain solution; escolher a melhor peça;
 			*coloca a primeira peça no centro*/
+	begin = clock();
+	used_pieces.array[0].x = MAX_PIECES;
+	used_pieces.array[0].y = MAX_PIECES;
 
-	for (im = 0; im < num_partsCopy; im++) {
-		available_pieces.array[im].x = MAX_PIECES;
-		available_pieces.array[im].y = MAX_PIECES;
-
-		playing_field.matrix[MAX_PIECES].array[MAX_PIECES] = available_pieces.array[im];
-
-		/*ACRESCENTA AO USED ARRAY*/
-		used_pieces.array[0] = available_pieces.array[im];
-
-		/*elimina das available_pieces*/
-		newAvailablePieces5 = deleteFromArray(available_pieces, im, num_partsCopy - used_array_size);
-
-
-		recursive_method(num_parts, used_pieces, newAvailablePieces5, playing_field, score, 1);
-
-	}
+	playing_field.matrix[MAX_PIECES].array[MAX_PIECES] = available_pieces.array[0];
+	/*elimina das available_pieces*/
+	newAvailablePieces = deleteFromArray(available_pieces, 0, num_partsCopy - used_array_size);
+	recursive_method(num_parts, used_pieces, newAvailablePieces, playing_field, score, 1);
 
 	printf("%ld\n", maxValue);
+		end = clock();
+
+	tempo = (double)(end-begin)/CLOCKS_PER_SEC;
+	printf("%f\n", tempo);
 	return 0;
 }
 
@@ -101,12 +95,7 @@ void recursive_method (int num_parts, ArrayPieces used_pieces, ArrayPieces avail
 	int x, y;
 	int used_array_sizeCopy = used_array_size;
 	ArrayPieces newAvailablePieces;
-	ArrayPieces newAvailablePieces1;
-	ArrayPieces newAvailablePieces2;
-	ArrayPieces newAvailablePieces3;
 
-
-	/*TODO:adicionar outro caso base: se ja nao houver match de peça nenhuma retorna logo sem registar score*/
 	if (num_parts == 1){
 		if (score >= maxValue){
 			maxValue = score;
@@ -136,6 +125,12 @@ void recursive_method (int num_parts, ArrayPieces used_pieces, ArrayPieces avail
 							newScore = score + playing_field.matrix[x].array[y].seq[c.firstIndex] + playing_field.matrix[x].array[y].seq[c.secondIndex];
 						}
 						if (matched) {
+							if (num_parts == 2){
+								if (newScore >= maxValue){
+									maxValue = newScore;
+								}
+								return;
+							}
 							available_pieces.array[il].x = x;
 							available_pieces.array[il].y = y - 1;
 							/*COLOCA NO TABULEIRO*/
@@ -185,6 +180,12 @@ void recursive_method (int num_parts, ArrayPieces used_pieces, ArrayPieces avail
 						}
 
 						if (matched) {
+							if (num_parts == 2){
+								if (newScore >= maxValue){
+									maxValue = newScore;
+								}
+								return;
+							}
 
 							available_pieces.array[iq].x = x;
 							available_pieces.array[iq].y = y + 1;
@@ -193,20 +194,20 @@ void recursive_method (int num_parts, ArrayPieces used_pieces, ArrayPieces avail
 							playing_field.matrix[x].array[y+1] = available_pieces.array[iq];
 
 							/*elimina das available_pieces*/
-							newAvailablePieces1 = deleteFromArray(available_pieces, iq, num_partsCopy - used_array_size);
+							newAvailablePieces = deleteFromArray(available_pieces, iq, num_partsCopy - used_array_size);
 
 							/*ACRESCENTA AO USED ARRAY*/
 							used_array_sizeCopy++;
 							used_pieces.array[used_array_size-1] = playing_field.matrix[x].array[y+1] ;
 
-							recursive_method (num_parts-1, used_pieces, newAvailablePieces1, playing_field, newScore, used_array_size);
+							recursive_method (num_parts-1, used_pieces, newAvailablePieces, playing_field, newScore, used_array_size);
 
 							/*DESFAZ ALTERAÇÂO NO TABULEIRO*/
 							playing_field.matrix[x].array[y+1].seq[0] = -1;
 
-							used_array_sizeCopy++;
+							used_array_sizeCopy--;
 
-							/*TODO: SE SOBRAR APENAS UMA PEÇA, TESTA LOGO SE A PODE COLOCAR OU NAO EM VEZ DE ESTAR A CHAMAR RECURSIVAMENTE OUTRA VEZ*/
+
 							break; /*uma peça nao pode ter 2 lados que encaixem num lado de outra peça portanto podemos sair logo*/
 						} else {
 							/*SO RODA A PEÇA SE NÂO HOUVER MATCH DE UM LADO*/
@@ -225,6 +226,12 @@ void recursive_method (int num_parts, ArrayPieces used_pieces, ArrayPieces avail
 						newScore = score + playing_field.matrix[x].array[y].seq[c.firstIndex] + playing_field.matrix[x].array[y].seq[c.secondIndex];
 
 						if (matched) {
+							if (num_parts == 2){
+								if (newScore >= maxValue){
+									maxValue = newScore;
+								}
+								return;
+							}
 							available_pieces.array[ih].x = x + 1;
 							available_pieces.array[ih].y = y;
 
@@ -232,13 +239,13 @@ void recursive_method (int num_parts, ArrayPieces used_pieces, ArrayPieces avail
 							playing_field.matrix[x+1].array[y] = available_pieces.array[ih];
 
 							/*elimina das available_pieces*/
-							newAvailablePieces2 = deleteFromArray(available_pieces, ih, num_partsCopy - used_array_size);
+							newAvailablePieces = deleteFromArray(available_pieces, ih, num_partsCopy - used_array_size);
 
 							/*ACRESCENTA AO USED ARRAY*/
 							used_array_sizeCopy++;
 							used_pieces.array[used_array_size-1] = playing_field.matrix[x+1].array[y];
 
-							recursive_method (num_parts-1, used_pieces, newAvailablePieces2, playing_field, newScore, used_array_size);
+							recursive_method (num_parts-1, used_pieces, newAvailablePieces, playing_field, newScore, used_array_size);
 
 							/*DESFAZ ALTERAÇÂO NO TABULEIRO*/
 							playing_field.matrix[x+1].array[y].seq[0] = -1;
@@ -264,6 +271,12 @@ void recursive_method (int num_parts, ArrayPieces used_pieces, ArrayPieces avail
 						newScore = score + playing_field.matrix[x].array[y].seq[a.firstIndex] + playing_field.matrix[x].array[y].seq[a.secondIndex];
 
 						if (matched) {
+							if (num_parts == 2){
+								if (newScore >= maxValue){
+									maxValue = newScore;
+								}
+								return;
+							}
 							available_pieces.array[id].x = x - 1;
 							available_pieces.array[id].y = y;
 
@@ -271,13 +284,13 @@ void recursive_method (int num_parts, ArrayPieces used_pieces, ArrayPieces avail
 							playing_field.matrix[x-1].array[y] = available_pieces.array[id];
 
 							/*elimina das available_pieces*/
-							newAvailablePieces3 = deleteFromArray(available_pieces, id, num_partsCopy - used_array_size);
+							newAvailablePieces = deleteFromArray(available_pieces, id, num_partsCopy - used_array_size);
 
 							/*ACRESCENTA AO USED ARRAY*/
 							used_array_sizeCopy++;
 							used_pieces.array[used_array_size-1] = playing_field.matrix[x-1].array[y];
 
-							recursive_method (num_parts-1, used_pieces, newAvailablePieces3, playing_field, newScore, used_array_size);
+							recursive_method (num_parts-1, used_pieces, newAvailablePieces, playing_field, newScore, used_array_size);
 
 							/*DESFAZ ALTERAÇÂO NO TABULEIRO*/
 							playing_field.matrix[x-1].array[y].seq[0] = -1;
