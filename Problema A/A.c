@@ -307,13 +307,12 @@ void recursive_method (int num_parts, ArrayPieces used_pieces, ArrayPieces avail
 					}
 				}
 			}
-
-			if(!matched){
-				if (score >= maxValue){
-					maxValue = score;
-				}
-				return;
+		}
+		if(!matched){
+			if (score >= maxValue){
+				maxValue = score;
 			}
+			return;
 		}
 	}
 
