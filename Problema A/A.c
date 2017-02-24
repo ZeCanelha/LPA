@@ -25,7 +25,6 @@ typedef struct {
 } MatrixPieces;
 
 int num_partsCopy = 0;
-int num_parts = 1;
 long maxValue = 0;
 long score = 0;
 
@@ -42,13 +41,16 @@ void establishSides();
 MatrixPieces putOnPosition (int x, int y, ArrayPieces available_pieces, int index, MatrixPieces playing_field);
 void recursive_method (int num_parts, ArrayPieces used_pieces, ArrayPieces available_pieces, MatrixPieces playing_field, int score, int used_array_size);
 ArrayPieces disablePiece (ArrayPieces available_pieces, int index);
+ArrayPieces deleteFromArray(ArrayPieces myArray, int position, int n);
 
 /*FUNCTIONS ---------------------------------------------------------------------*/
 int main(int argc, char const *argv[]) {
 	/* int im; */
+	int num_parts = 0, im, used_array_size = 1, i;
 	MatrixPieces playing_field;
 	ArrayPieces available_pieces;
 	ArrayPieces used_pieces;
+	ArrayPieces newAvailablePieces5;
 
 	/*inicializar indices de orientação das peças*/
 	establishSides();
@@ -58,29 +60,34 @@ int main(int argc, char const *argv[]) {
 	memset (available_pieces.array, -1, sizeof(available_pieces.array));
 	memset (used_pieces.array, -1 , sizeof(used_pieces.array));
 
-	while(scanf("%d %d %d",&available_pieces.array[num_parts - 1].seq[0], &available_pieces.array[num_parts - 1].seq[1],&available_pieces.array[num_parts - 1].seq[2]) != EOF && num_parts < MAX_PIECES ) {
+	while(scanf("%d %d %d",&available_pieces.array[num_parts].seq[0], &available_pieces.array[num_parts].seq[1],&available_pieces.array[num_parts].seq[2]) != EOF && num_parts < MAX_PIECES ) {
 		num_parts++;
 	}
+
 	num_partsCopy = num_parts;
 
 	/*
+	* Actualiza a lista de peças usadas
+	* TODO: Se actualizar aqui a lista das peças usadas estou sempre a passar um array com + 1 peço nova
+	* TODO: mxPain solution; escolher a melhor peça;
+			*coloca a primeira peça no centro*/
+
 	for (im = 0; im < num_partsCopy; im++) {
-		*coloca a primeira peça no centro
+		available_pieces.array[im].x = MAX_PIECES;
+		available_pieces.array[im].y = MAX_PIECES;
+
 		playing_field.matrix[MAX_PIECES].array[MAX_PIECES] = available_pieces.array[im];
 
-		* Actualiza a lista de peças usadas
-		* TODO: Se actualizar aqui a lista das peças usadas estou sempre a passar um array com + 1 peço nova
-		* TODO: mxPain solution; escolher a melhor peça;
+		/*ACRESCENTA AO USED ARRAY*/
+		used_pieces.array[0] = available_pieces.array[im];
 
-		recursive_method(num_parts, used_pieces, available_pieces, playing_field, score);
-	} */
+		/*elimina das available_pieces*/
+		newAvailablePieces5 = deleteFromArray(available_pieces, im, num_partsCopy - used_array_size);
 
-	playing_field.matrix[MAX_PIECES].array[MAX_PIECES] = available_pieces.array[0];
 
-	used_pieces.array[0].x = MAX_PIECES;
-	used_pieces.array[0].y = MAX_PIECES;
+		recursive_method(num_parts, used_pieces, newAvailablePieces5, playing_field, score, 1);
 
-	recursive_method(num_parts, used_pieces, available_pieces, playing_field, score,1);
+	}
 
 	printf("%ld\n", maxValue);
 	return 0;
@@ -90,8 +97,13 @@ void recursive_method (int num_parts, ArrayPieces used_pieces, ArrayPieces avail
 	/*cada vez que se invoca o metodo recursivo uma copia do tabuleiro e das peças disponiveis tem que ser guardada*/
 	int newScore = 0;
 	int matched = 0;
-	int z,h,q,l,m, tmp, i;
+	int h,q,l,it, il, t, ih, iq, id, i;
 	int x, y;
+	ArrayPieces newAvailablePieces;
+	ArrayPieces newAvailablePieces1;
+	ArrayPieces newAvailablePieces2;
+	ArrayPieces newAvailablePieces3;
+
 
 	/*TODO:adicionar outro caso base: se ja nao houver match de peça nenhuma retorna logo sem registar score*/
 	if (num_parts == 1){
@@ -100,211 +112,74 @@ void recursive_method (int num_parts, ArrayPieces used_pieces, ArrayPieces avail
 		}
 		return;
 	} else {
+		/*TODO:nao pode ser até used_array_size*/
+		for (it = 0; it < used_array_size; it++) {
+			x = used_pieces.array[it].x;
+			y = used_pieces.array[it].y;
 
-		/* Verificar se a peça encaixa num dos lados e criar um caminho recursivo para cada um dos lados */
+			/*INSERIR À ESQUERDA*/
+			if ( playing_field.matrix[x].array[y - 1].seq[0] == -1 ) {
 
-		for ( z = 1; z < num_partsCopy; z++ )
-		{
-			/* Verificar se esta peça encaixa em qq uma do tabuleiro */
-			/* Se a peça estiver disponível */
-			/* TODO: Verificar até que ponto esta condição se verifica nesta nova recursão */
-			if (available_pieces.array[z].seq[0] != -1){
+				for (il = 0; il < num_partsCopy - used_array_size; il++) {
 
-				/* TODO: Esta variável está em falta, só pra ver a situação e como resolver ( used_array_size ) */
+					for (l=0; l < 3; l++) { /*NO MAXIMO RODA 2 VEZES*/
 
-				for ( i = 0; i < used_array_size; i++ )
-				{
-					/* Se a peça tiver uma aresta disponivel á esquerda, começar a preencher á esquerda */
-					x = used_pieces.array[i].x;
-					y = used_pieces.array[i].y;
-
-					if ( playing_field.matrix[x].array[y - 1].seq[0] == -1 )
-					{
-						/* Rotação da piça */
-
-						for (l=0; l < 3; l++) { /*NO MAXIMO RODA 2 VEZES*/
-
-							/*PEÇA VIRADA PARA CIMA*/
-							if (x%2 == y%2) {
-
-								/*EMPARELHAR O LADO A DA MINHA PEÇA COM O LADO B DA PEÇA NOVA*/
-								matched = (playing_field.matrix[x].array[y].seq[a.firstIndex] == available_pieces.array[z].seq[b.secondIndex]) && (playing_field.matrix[x].array[y].seq[a.secondIndex] == available_pieces.array[z].seq[b.firstIndex]);
-								/*printf("EMPARELHEI COM PEÇA VIRADA PARA CIMA à ESQUERDA: %d\n", matched);*/
-								newScore = score + playing_field.matrix[x].array[y].seq[a.firstIndex] + playing_field.matrix[x].array[y].seq[a.secondIndex];
-							/*PEÇA VIRADA PARA BAIXO*/
-							} else {
-
-								/*EMPARELHAR O LADO C DA MINHA PEÇA COM O LADO B DA PEÇA NOVA*/
-								matched = (playing_field.matrix[x].array[y].seq[c.firstIndex] == available_pieces.array[z].seq[b.firstIndex]) && (playing_field.matrix[x].array[y].seq[c.secondIndex] == available_pieces.array[z].seq[b.secondIndex]);
-								/*printf("EMPARELHEI COM PEÇA VIRADA PARA BAIXO à ESQUERDA: %d\n", matched);*/
-								newScore = score + playing_field.matrix[x].array[y].seq[c.firstIndex] + playing_field.matrix[x].array[y].seq[c.secondIndex];
-							}
-
-							if (matched) {
-								tmp = available_pieces.array[z].seq[0];
-
-								/*COLOCA A PEÇA DE NOVO NO TABULEIRO*/
-								playing_field.matrix[x].array[y-1] = available_pieces.array[z];
-								available_pieces.array[z].x = x;
-								available_pieces.array[z].y = y - 1;
-								used_pieces.array[used_array_size] = available_pieces.array[z];
-
-								/*PEÇA DEIXA DE ESTAR DISPONIVEL*/
-								available_pieces.array[z].seq[0] = -1;
-
-								recursive_method (num_parts-1, used_pieces, available_pieces, playing_field, newScore, ++used_array_size);
-
-								/*DESFAZ ALTERAÇÂONO TABULEIRO*/
-								playing_field.matrix[x].array[y-1].seq[0] = -1;
-
-								/*PEÇA VOLTA A ESTAR DISPONIVEL -> TODO: Grande FINO */
-								available_pieces.array[z].seq[0] = tmp;
-
-								/*TODO: SE SOBRAR APENAS UMA PEÇA, TESTA LOGO SE A PODE COLOCAR OU NAO EM VEZ DE ESTAR A CHAMAR RECURSIVAMENTE OUTRA VEZ*/
-								break; /*uma peça nao pode ter 2 lados que encaixem num lado de outra peça portanto podemos sair logo*/
-							} else {
-								/*SO RODA A PEÇA SE NÂO HOUVER MATCH DE UM LADO*/
-								rotate_piece(&available_pieces.array[z]);
-							}
-					}
-				}
-
-				/* Verificar se pode começar a preencher á direita */
-
-				if (playing_field.matrix[x].array[y+1].seq[0] == -1)
-				{
-					/* Rotação */
-					for (q=0; q < 3; q++) { /*NO MAXIMO RODA 2 VEZES*/
 						/*PEÇA VIRADA PARA CIMA*/
 						if (x%2 == y%2) {
-							/*EMPARELHAR O LADO B DA MINHA PEÇA COM O LADO C DA PEÇA NOVA*/
-							matched = (playing_field.matrix[x].array[y].seq[b.firstIndex] == available_pieces.array[z].seq[c.firstIndex]) && (playing_field.matrix[x].array[y].seq[b.secondIndex] == available_pieces.array[z].seq[c.secondIndex]);
-							/*printf("EMPARELHEI COM PEÇA VIRADA PARA CIMA à DIREITA: %d\n", matched);*/
-							newScore = score + playing_field.matrix[x].array[y].seq[b.firstIndex] + playing_field.matrix[x].array[y].seq[b.secondIndex];
+
+							/*EMPARELHAR O LADO A DA MINHA PEÇA COM O LADO B DA PEÇA NOVA*/
+							matched = (playing_field.matrix[x].array[y].seq[a.firstIndex] == available_pieces.array[il].seq[b.secondIndex]) && (playing_field.matrix[x].array[y].seq[a.secondIndex] == available_pieces.array[il].seq[b.firstIndex]);
+							newScore = score + playing_field.matrix[x].array[y].seq[a.firstIndex] + playing_field.matrix[x].array[y].seq[a.secondIndex];
 						/*PEÇA VIRADA PARA BAIXO*/
 						} else {
-							/*EMPARELHAR O LADO B DA MINHA PEÇA COM O LADO A DA PEÇA NOVA*/
-							matched = (playing_field.matrix[x].array[y].seq[b.firstIndex] == available_pieces.array[z].seq[a.secondIndex]) && (playing_field.matrix[x].array[y].seq[b.secondIndex] == available_pieces.array[z].seq[a.firstIndex]);
-							/*printf("EMPARELHEI COM PEÇA VIRADA PARA BAIXO à DIREITA: %d\n", matched);*/
-							newScore = score + playing_field.matrix[x].array[y].seq[b.firstIndex] + playing_field.matrix[x].array[y].seq[b.secondIndex];
+							/*EMPARELHAR O LADO C DA MINHA PEÇA COM O LADO B DA PEÇA NOVA*/
+							matched = (playing_field.matrix[x].array[y].seq[c.firstIndex] == available_pieces.array[il].seq[b.firstIndex]) && (playing_field.matrix[x].array[y].seq[c.secondIndex] == available_pieces.array[il].seq[b.secondIndex]);
+							/*printf("EMPARELHEI COM PEÇA VIRADA PARA BAIXO à ESQUERDA: %d\n", matched);*/
+							newScore = score + playing_field.matrix[x].array[y].seq[c.firstIndex] + playing_field.matrix[x].array[y].seq[c.secondIndex];
 						}
 
 						if (matched) {
-							tmp = available_pieces.array[z].seq[0];
+
+							available_pieces.array[il].x = x;
+							available_pieces.array[il].y = y - 1;
 
 							/*COLOCA A PEÇA DE NOVO NO TABULEIRO*/
-							playing_field.matrix[x].array[y-1] = available_pieces.array[z];
-							available_pieces.array[z].x = x;
-							available_pieces.array[z].y = y + 1;
-							used_pieces.array[used_array_size] = available_pieces.array[z];
+							playing_field.matrix[x].array[y-1] = available_pieces.array[il];
 
-							/*PEÇA DEIXA DE ESTAR DISPONIVEL*/
-							available_pieces.array[z].seq[0] = -1;
+							/*elimina das available_pieces*/
+							newAvailablePieces = deleteFromArray(available_pieces, il, num_partsCopy - used_array_size);
 
-							recursive_method (num_parts-1, used_pieces, available_pieces, playing_field, newScore, ++used_array_size);
+							/*ACRESCENTA AO USED ARRAY*/
+							used_array_size++;
+							used_pieces.array[used_array_size-1] = playing_field.matrix[x].array[y-1] ;
 
-							/*DESFAZ ALTERAÇÂO NO TABULEIRO NO TABULEIRO*/
-							playing_field.matrix[x].array[y+1].seq[0] = -1;
+							recursive_method (num_parts-1, used_pieces, newAvailablePieces, playing_field, newScore, used_array_size);
 
-							/*PEÇA VOLTA A ESTAR DISPONIVEL*/
-							available_pieces.array[z].seq[0] = tmp;
+							/*DESFAZ ALTERAÇÂO NO TABULEIRO*/
+							playing_field.matrix[x].array[y-1].seq[0] = -1;
 
-							/*TODO: SE SOBRAR APENAS UMA PEÇA, TESTA LOGO SE A PODE COLOCAR OU NAO EM VEZ DE ESTAR A CHAMAR RECURSIVAMENTE OUTRA VEZ*/
-							break; /*uma peça nao pode ter 2 lados que encaixem num lado de outra peça portanto podemos sair logo*/
-
-						} else {
-							/*SO RODA A PEÇA SE NÂO HOUVER MATCH DE UM LADO*/
-							rotate_piece(&available_pieces.array[z]);
-						}
-					}
-				}
-
-
-				/* Verficar se pode preencher em baixo */
-
-				if ((y % 2 == x% 2) && playing_field.matrix[x+1].array[y].seq[0] == -1)
-				{
-					/* Rotação */
-					for (h=0; h < 3; h++) { /*NO MAXIMO RODA 2 VEZES*/
-						matched = (playing_field.matrix[x].array[y].seq[c.firstIndex] == available_pieces.array[z].seq[a.firstIndex]) && (playing_field.matrix[x].array[y].seq[c.secondIndex] == available_pieces.array[z].seq[a.secondIndex]);
-						/*printf("EMPARELHEI COM PEÇA VIRADA PARA CIMA à ABAIXO: %d\n", matched);*/
-						newScore = score + playing_field.matrix[x].array[y].seq[c.firstIndex] + playing_field.matrix[x].array[y].seq[c.secondIndex];
-						if (matched) {
-							tmp = available_pieces.array[z].seq[0];
-
-							/*COLOCA A PEÇA DE NOVO NO TABULEIRO*/
-							playing_field.matrix[x+1].array[y] = available_pieces.array[z];
-							available_pieces.array[z].x = x+1;
-							available_pieces.array[z].y = y;
-							used_pieces.array[used_array_size] = available_pieces.array[z];
-
-							/*PEÇA DEIXA DE ESTAR DISPONIVEL*/
-							available_pieces.array[z].seq[0] = -1;
-
-							recursive_method (num_parts-1, used_pieces, available_pieces, playing_field, newScore,++used_array_size);
-
-							/*DESFAZ ALTERAÇÂO NO TABULEIRO NO TABULEIRO*/
-							playing_field.matrix[x+1].array[y].seq[0] = -1;
-
-							/*PEÇA VOLTA A ESTAR DISPONIVEL*/
-							available_pieces.array[z].seq[0] = tmp;
+							used_array_size--;
 
 							/*TODO: SE SOBRAR APENAS UMA PEÇA, TESTA LOGO SE A PODE COLOCAR OU NAO EM VEZ DE ESTAR A CHAMAR RECURSIVAMENTE OUTRA VEZ*/
 							break; /*uma peça nao pode ter 2 lados que encaixem num lado de outra peça portanto podemos sair logo*/
 						} else {
 							/*SO RODA A PEÇA SE NÂO HOUVER MATCH DE UM LADO*/
-							rotate_piece(&available_pieces.array[z]);
+							rotate_piece(&available_pieces.array[il]);
 						}
 					}
 				}
-				/* Verficcar se pode preencher em cima */
-				if ((y % 2 != x% 2) && playing_field.matrix[x-1].array[y].seq[0] == -1)
-				{
-					/* Rotação da piça */
-					for (m=0; m < 3; m++) { /*NO MAXIMO RODA 2 VEZES*/
-						matched = (playing_field.matrix[x].array[y].seq[a.firstIndex] == available_pieces.array[z].seq[c.firstIndex]) && (playing_field.matrix[x].array[y].seq[a.secondIndex] == available_pieces.array[z].seq[c.secondIndex]);
-						/*printf("EMPARELHEI COM PEÇA VIRADA PARA BAIXO à ACIMA: %d\n", matched);*/
-						newScore = score + playing_field.matrix[x].array[y].seq[a.firstIndex] + playing_field.matrix[x].array[y].seq[a.secondIndex];
-						if (matched) {
-							tmp = available_pieces.array[z].seq[0];
-
-							/*COLOCA A PEÇA DE NOVO NO TABULEIRO*/
-							playing_field.matrix[x-1].array[y] = available_pieces.array[z];
-							available_pieces.array[z].x = x - 1;
-							available_pieces.array[z].y = y;
-							used_pieces.array[used_array_size] = available_pieces.array[z];
+			}
 
 
-							/*PEÇA DEIXA DE ESTAR DISPONIVEL*/
-							available_pieces.array[z].seq[0] = -1;
-
-							recursive_method (num_parts-1, used_pieces, available_pieces, playing_field, newScore, ++used_array_size);
-
-							/*DESFAZ ALTERAÇÂO NO TABULEIRO NO TABULEIRO*/
-							playing_field.matrix[x-1].array[y].seq[0] = -1;
-
-							/*PEÇA VOLTA A ESTAR DISPONIVEL*/
-							available_pieces.array[z].seq[0] = tmp;
-
-							/*TODO: SE SOBRAR APENAS UMAPEÇA, TESTA LOGO SE A PODE COLOCAR OU NAO EM VEZ DE ESTAR A CHAMAR RECURSIVAMENTE OUTRA VEZ*/
-							break; /*uma peça nao pode ter 2 lados que encaixem num lado de outra peça portanto podemos sair logo*/
-						} else {
-							/*SO RODA A PEÇA SE NÂO HOUVER MATCH DE UM LADO*/
-							rotate_piece(&available_pieces.array[z]);
-						}
-					}
+			if(!matched){
+				if (score >= maxValue){
+					maxValue = score;
 				}
-
-				if(!matched){
-					if (score >= maxValue){
-						maxValue = score;
-					}
-					return;
-				}
+				return;
 			}
 		}
 	}
-}
+
 }
 
 /*method that rotates a piece one time*/
@@ -382,4 +257,12 @@ void establishSides() {
 	b.secondIndex = 2;
 	c.firstIndex = 0;
 	c.secondIndex = 2;
+}
+
+ArrayPieces deleteFromArray(ArrayPieces myArray, int position, int n) {
+	int c;
+      for ( c = position; c < n -1; c++ ){
+         myArray.array[c] = myArray.array[c+1];
+	 }
+	return myArray;
 }
