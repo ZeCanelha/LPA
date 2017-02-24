@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_PIECES 20
+#define MAX_PIECES 6
 
 /* STRUCTS AND CONSTANTS ------------------------------------------------------------*/
 typedef struct {
@@ -68,7 +68,7 @@ int main(int argc, char const *argv[]) {
 		recursive_method(num_parts, MAX_PIECES, MAX_PIECES, available_pieces, playing_field, score);
 	}
 
-	printf("SCORE IGUAL A: 	%ld\n", maxValue);
+	printf("%ld\n", maxValue);
 	return 0;
 }
 
@@ -142,14 +142,14 @@ void recursive_method (int num_parts, int x, int y, ArrayPieces available_pieces
 					for (q=0; q < 3; q++) { /*NO MAXIMO RODA 2 VEZES*/
 						/*PEÇA VIRADA PARA CIMA*/
 						if (x%2 == y%2) {
-							/*EMPARELHAR O LADO B DA MINHA PEÇA COM O LADO A DA PEÇA NOVA*/
-							matched = (playing_field.matrix[x].array[y].seq[b.firstIndex] == available_pieces.array[f].seq[a.firstIndex]) && (playing_field.matrix[x].array[y].seq[b.secondIndex] == available_pieces.array[f].seq[a.secondIndex]);
+							/*EMPARELHAR O LADO B DA MINHA PEÇA COM O LADO C DA PEÇA NOVA*/
+							matched = (playing_field.matrix[x].array[y].seq[b.firstIndex] == available_pieces.array[f].seq[c.firstIndex]) && (playing_field.matrix[x].array[y].seq[b.secondIndex] == available_pieces.array[f].seq[c.secondIndex]);
 							/*printf("EMPARELHEI COM PEÇA VIRADA PARA CIMA à DIREITA: %d\n", matched);*/
 							newScore = score + playing_field.matrix[x].array[y].seq[b.firstIndex] + playing_field.matrix[x].array[y].seq[b.secondIndex];
 						/*PEÇA VIRADA PARA BAIXO*/
 						} else {
 							/*EMPARELHAR O LADO B DA MINHA PEÇA COM O LADO A DA PEÇA NOVA*/
-							matched = (playing_field.matrix[x].array[y].seq[b.firstIndex] == available_pieces.array[f].seq[a.firstIndex]) && (playing_field.matrix[x].array[y].seq[b.secondIndex] == available_pieces.array[f].seq[a.secondIndex]);
+							matched = (playing_field.matrix[x].array[y].seq[b.firstIndex] == available_pieces.array[f].seq[a.secondIndex]) && (playing_field.matrix[x].array[y].seq[b.secondIndex] == available_pieces.array[f].seq[a.firstIndex]);
 							/*printf("EMPARELHEI COM PEÇA VIRADA PARA BAIXO à DIREITA: %d\n", matched);*/
 							newScore = score + playing_field.matrix[x].array[y].seq[b.firstIndex] + playing_field.matrix[x].array[y].seq[b.secondIndex];
 						}
@@ -222,7 +222,7 @@ void recursive_method (int num_parts, int x, int y, ArrayPieces available_pieces
 			for (n = 1; n < num_partsCopy; n++) {/*testar todas as combinações com peças disponiveis ainda para jogar - TODO:OTIMIZAR ISTO PORQUE ITERATIVAMENTE DEMORA MUITO TEMPO*/
 				if (available_pieces.array[n].seq[0] != -1) {
 					for (m=0; m < 3; m++) { /*NO MAXIMO RODA 2 VEZES*/
-						matched = (playing_field.matrix[x].array[y].seq[a.firstIndex] == available_pieces.array[n].seq[a.secondIndex]) && (playing_field.matrix[x].array[y].seq[a.secondIndex] == available_pieces.array[n].seq[a.firstIndex]);
+						matched = (playing_field.matrix[x].array[y].seq[a.firstIndex] == available_pieces.array[n].seq[c.firstIndex]) && (playing_field.matrix[x].array[y].seq[a.secondIndex] == available_pieces.array[n].seq[c.secondIndex]);
 						/*printf("EMPARELHEI COM PEÇA VIRADA PARA BAIXO à ACIMA: %d\n", matched);*/
 						newScore = score + playing_field.matrix[x].array[y].seq[a.firstIndex] + playing_field.matrix[x].array[y].seq[a.secondIndex];
 						if (matched) {
