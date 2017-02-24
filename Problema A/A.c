@@ -168,60 +168,65 @@ void recursive_method (int num_parts, ArrayPieces used_pieces, ArrayPieces avail
 							}
 					}
 				}
-			}
-		}
 
-		/* Verificar se pode preencher á direita */
+				/* Verificar se pode começar a preencher á direita */
 
-	}
-
-		if (playing_field.matrix[x].array[y+1].seq[0] == -1){ 	/*COMEÇAR A PREENCHER À DIREITA*/
-			/*CORRER AS PEÇAS DISPONIVEIS TODAS*/
-			for (f = 1; f < num_partsCopy; f++) {/*testar todas as combinações com peças disponiveis ainda para jogar - TODO:OTIMIZAR ISTO PORQUE ITERATIVAMENTE DEMORA MUITO TEMPO*/
-				if (available_pieces.array[f].seq[0] != -1) {
+				if (playing_field.matrix[x].array[y+1].seq[0] == -1)
+				{
+					/* Rotação */
 					for (q=0; q < 3; q++) { /*NO MAXIMO RODA 2 VEZES*/
 						/*PEÇA VIRADA PARA CIMA*/
 						if (x%2 == y%2) {
 							/*EMPARELHAR O LADO B DA MINHA PEÇA COM O LADO C DA PEÇA NOVA*/
-							matched = (playing_field.matrix[x].array[y].seq[b.firstIndex] == available_pieces.array[f].seq[c.firstIndex]) && (playing_field.matrix[x].array[y].seq[b.secondIndex] == available_pieces.array[f].seq[c.secondIndex]);
+							matched = (playing_field.matrix[x].array[y].seq[b.firstIndex] == available_pieces.array[z].seq[c.firstIndex]) && (playing_field.matrix[x].array[y].seq[b.secondIndex] == available_pieces.array[z].seq[c.secondIndex]);
 							/*printf("EMPARELHEI COM PEÇA VIRADA PARA CIMA à DIREITA: %d\n", matched);*/
 							newScore = score + playing_field.matrix[x].array[y].seq[b.firstIndex] + playing_field.matrix[x].array[y].seq[b.secondIndex];
 						/*PEÇA VIRADA PARA BAIXO*/
 						} else {
 							/*EMPARELHAR O LADO B DA MINHA PEÇA COM O LADO A DA PEÇA NOVA*/
-							matched = (playing_field.matrix[x].array[y].seq[b.firstIndex] == available_pieces.array[f].seq[a.secondIndex]) && (playing_field.matrix[x].array[y].seq[b.secondIndex] == available_pieces.array[f].seq[a.firstIndex]);
+							matched = (playing_field.matrix[x].array[y].seq[b.firstIndex] == available_pieces.array[z].seq[a.secondIndex]) && (playing_field.matrix[x].array[y].seq[b.secondIndex] == available_pieces.array[z].seq[a.firstIndex]);
 							/*printf("EMPARELHEI COM PEÇA VIRADA PARA BAIXO à DIREITA: %d\n", matched);*/
 							newScore = score + playing_field.matrix[x].array[y].seq[b.firstIndex] + playing_field.matrix[x].array[y].seq[b.secondIndex];
 						}
 
 						if (matched) {
-							tmp = available_pieces.array[f].seq[0];
+							tmp = available_pieces.array[z].seq[0];
 
 							/*COLOCA A PEÇA DE NOVO NO TABULEIRO*/
-							playing_field.matrix[x].array[y+1] = available_pieces.array[f];
+							playing_field.matrix[x].array[y-1] = available_pieces.array[z];
+							available_pieces.array[z].x = x;
+							available_pieces.array[z].y = y;
+							used_pieces.array[used_array_size] = available_pieces.array[z];
 
 							/*PEÇA DEIXA DE ESTAR DISPONIVEL*/
-							available_pieces.array[f].seq[0] = -1;
+							available_pieces.array[z].seq[0] = -1;
 
-							recursive_method (num_parts-1, x, y+1, available_pieces, playing_field, newScore);
+							recursive_method (num_parts-1, used_pieces, available_pieces, playing_field, newScore, ++used_array_size);
 
 							/*DESFAZ ALTERAÇÂO NO TABULEIRO NO TABULEIRO*/
 							playing_field.matrix[x].array[y+1].seq[0] = -1;
 
 							/*PEÇA VOLTA A ESTAR DISPONIVEL*/
-							available_pieces.array[f].seq[0] = tmp;
+							available_pieces.array[z].seq[0] = tmp;
 
 							/*TODO: SE SOBRAR APENAS UMA PEÇA, TESTA LOGO SE A PODE COLOCAR OU NAO EM VEZ DE ESTAR A CHAMAR RECURSIVAMENTE OUTRA VEZ*/
 							break; /*uma peça nao pode ter 2 lados que encaixem num lado de outra peça portanto podemos sair logo*/
 
 						} else {
 							/*SO RODA A PEÇA SE NÂO HOUVER MATCH DE UM LADO*/
-							rotate_piece(&available_pieces.array[f]);
+							rotate_piece(&available_pieces.array[z]);
 						}
 					}
 				}
+
+
+				/* Verficar se pode preencher em baixo */
+
+				/* Verficcar se pode preencher em cima */
+
 			}
 		}
+	}
 
 		/*COMEÇAR A PREENCHER ABAIXO*/
 		if ((y % 2 == x% 2) && playing_field.matrix[x+1].array[y].seq[0] == -1){
