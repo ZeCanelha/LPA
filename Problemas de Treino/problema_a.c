@@ -13,7 +13,7 @@ int main(int argc, char const *argv[]) {
   int n_cases;
   int n_rows;
   int row, column;
-  int i, j, z;
+  int i, j, z, l;
 
   int max_geral = 0;
 
@@ -44,28 +44,23 @@ int main(int argc, char const *argv[]) {
     memset(dynamic_matrix, 0, sizeof(dynamic_matrix));
 
     dynamic_matrix[1][1] = matrix[0][0];
+    max_geral = dynamic_matrix[1][1];
 
     for (row = 1; row < n_rows+1; row++) {
       for (column = 1; column < row+1 ; column++) {
-        /*VERIFICA EM CIMA*/
-        if (dynamic_matrix[row-1][column] > dynamic_matrix[row-1][column-1]) {
-          dynamic_matrix[row][column] = dynamic_matrix[row-1][column] + matrix[row][column];
-        } else if(dynamic_matrix[row-1][column] < dynamic_matrix[row-1][column-1]){
-          /*VERIFICA ESQUERDA*/
-          dynamic_matrix[row][column] = dynamic_matrix[row-1][column] + matrix[row][column-1];
-        }
+        /*VERIFICA EM ESQUERDA*/
+        int maximo = max(dynamic_matrix[row-1][column], dynamic_matrix[row-1][column-1]);
+        dynamic_matrix[row][column] = matrix[row-1][column-1] + maximo;
       }
     }
 
-    printf("NOVA MATRIX:\n");
-    for (row = 0; row < n_rows+1; row++) {
-      for (column = 0; column < row+1; column++) {
-        /*VERIFICA EM CIMA*/
-        printf("%d ", dynamic_matrix[row][column]);
-      }
-      printf("\n");
+    for (l = 0; l < n_rows+1; l++) {
+        if (dynamic_matrix[n_rows][l] > max_geral){
+            max_geral = dynamic_matrix[n_rows][l];
+        }
     }
+    printf("%d\n", max_geral);
   }
-  printf("Score: %d\n", max_geral);
+
   return 0;
 }
