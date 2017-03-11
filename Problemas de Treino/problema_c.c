@@ -1,19 +1,54 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+
+int cord_lobos[100][2];
+int n_lobos;
+int heigth;
+int width, i;
+int n_paths = 0;
+int dynamic_matrix[5][5];
+
+int countPaths(int x, int y){
+
+    int C1 = 0;
+    int C2 = 0;
+
+    if (dynamic_matrix[x][y] != -1) {
+        return dynamic_matrix[x][y];
+    }
+
+    if (x == width+1 || y == heigth+1) {
+        return 1;
+    }
+
+    for ( i = 0; i < n_lobos; i++) {
+
+        if (cord_lobos[i][0] != x+1) {
+            C1 = countPaths(x+1, y);
+            break;
+        }
+
+        if (cord_lobos[i][1] != y-1) {
+            C2 = countPaths(x, y-1);
+            break;
+        }
+
+    }
+
+    dynamic_matrix[x][y] = C1 + C2;
+
+    return dynamic_matrix[x][y];
+}
 
 int main(int argc, char const *argv[]) {
 
-    int n_lobos;
-    int height;
-    int width;
-    int n_paths;
-
-    int i;
+    int i, k;
 
     while(1)
     {
-        scanf("%d %d",&width,&height);
-        if ( width == 0 && height == 0)
+        scanf("%d %d",&width,&heigth);
+        if ( width == 0 && heigth == 0)
         {
             break;
         }
@@ -22,24 +57,29 @@ int main(int argc, char const *argv[]) {
         scanf("%d",&n_lobos);
         int cord_lobos[n_lobos][2];
 
-        for ( i = 0; i < n_lobos; i++ )
-        {
+        for ( i = 0; i < n_lobos; i++ ) {
             scanf("%d %d",&cord_lobos[i][0],&cord_lobos[i][1]);
         }
 
+        memset(dynamic_matrix, -1, sizeof(dynamic_matrix));
 
+        n_paths = countPaths(width+1, 0);
+
+        for (k = 0; k < width+1; k++) {
+            printf("%d %d\n", dynamic_matrix[k][0],  dynamic_matrix[k][1]);
+        }
+        printf("\n");
 
         if ( n_paths > 1 )
         {
             printf("There are %d paths from Little Red Riding Hood's house to her grandmother's house.\n",n_paths);
-        }
-        if ( n_paths == 1 )
+        }else if ( n_paths == 1 )
         {
-            printf("There is one paths from Little Red Riding Hood's house to her grandmother's house.\n")
+            printf("There is one paths from Little Red Riding Hood's house to her grandmother's house.\n");
         }
         else
         {
-            printf("There is no path.\n")
+            printf("There is no path.\n");
         }
 
 
