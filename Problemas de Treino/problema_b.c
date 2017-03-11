@@ -22,16 +22,14 @@ int main(int argc, char const *argv[]) {
     scanf("%d", &n_coins);
     printf("N_COINS: %d\n", n_coins);
     int coins_value[n_coins];
+    int sum = 0;
 
     for (j = 0; j < n_coins; j++) {
       scanf("%d", &coins_value[j]);
-    }
-
-    int sum = 0;
-    /*Create the sum of every coin*/
-    for (j = 0; j < n_coins; j++) {
       sum += coins_value[j];
     }
+    sum += coins_value[j];
+printf("SUB_SUM:%d\n", sum);
 
     if (sum %2 != 0) {
       sub_sum = (sum /2) + 1;
@@ -39,7 +37,7 @@ int main(int argc, char const *argv[]) {
       sub_sum = sum /2;
     }
 
-    printf("SUB_SUM:%d\n", sub_sum);
+
     /*Create the dynamic_table for dynamic programming*/
 
     int dynamic_table[n_coins+1][sub_sum+1];
@@ -61,17 +59,15 @@ int main(int argc, char const *argv[]) {
     }
 
     printf("AFTER\n");
-    for (k = 1; k < n_coins+1; k++) {
-      for (j = 1; j < sub_sum +1; j++) {
+    for (k = 0; k < n_coins+1; k++) {
+      for (j = 0; j < sub_sum +1; j++) {
         /*If the weight value is superior than actual weight*/
         printf("%d ", dynamic_table[k][j]);
       }
       printf("\n");
     }
 
-    printf("LAST ELEMENT: %d\n", dynamic_table[n_coins+1][sub_sum+1]);
-    printf("A DIFERENCA ENTRE sub_sum(%d) e o melhor(%d) é = (%d)\n", sub_sum, dynamic_table[n_coins+1][sub_sum+1], sub_sum - dynamic_table[n_coins+1][sub_sum+1] );
-    printf("%d\n", sub_sum - dynamic_table[n_coins+1][sub_sum+1] );
+    printf("%d\n", sub_sum - dynamic_table[n_coins][sub_sum] );
 
   }
   return 0;
