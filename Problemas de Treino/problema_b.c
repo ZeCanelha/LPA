@@ -13,6 +13,7 @@ int main(int argc, char const *argv[]) {
   int n_coins = 0;
   int i, j, k;
 
+
   scanf("%d",&n_cases);
 
   /*SCAN THE CASE TESTS*/
@@ -20,16 +21,16 @@ int main(int argc, char const *argv[]) {
   {
 
     scanf("%d", &n_coins);
-    printf("N_COINS: %d\n", n_coins);
+
     int coins_value[n_coins];
     int sum = 0;
-
+    int inverseTotal = 0;
     for (j = 0; j < n_coins; j++) {
       scanf("%d", &coins_value[j]);
       sum += coins_value[j];
     }
-    sum += coins_value[j];
-printf("SUB_SUM:%d\n", sum);
+
+
 
     if (sum %2 != 0) {
       sub_sum = (sum /2) + 1;
@@ -58,16 +59,8 @@ printf("SUB_SUM:%d\n", sum);
       }
     }
 
-    printf("AFTER\n");
-    for (k = 0; k < n_coins+1; k++) {
-      for (j = 0; j < sub_sum +1; j++) {
-        /*If the weight value is superior than actual weight*/
-        printf("%d ", dynamic_table[k][j]);
-      }
-      printf("\n");
-    }
-
-    printf("%d\n", sub_sum - dynamic_table[n_coins][sub_sum] );
+    inverseTotal = sum - dynamic_table[n_coins][sub_sum];
+    printf("%d\n",  abs(dynamic_table[n_coins][sub_sum] - inverseTotal));
 
   }
   return 0;
