@@ -6,6 +6,7 @@ int main(int argc, char const *argv[]) {
     int n_lobos;
     int height;
     int width;
+    int n_paths;
 
     int i;
 
@@ -26,7 +27,21 @@ int main(int argc, char const *argv[]) {
             scanf("%d %d",&cord_lobos[i][0],&cord_lobos[i][1]);
         }
 
-        
+
+
+        if ( n_paths > 1 )
+        {
+            printf("There are %d paths from Little Red Riding Hood's house to her grandmother's house.\n",n_paths);
+        }
+        if ( n_paths == 1 )
+        {
+            printf("There is one paths from Little Red Riding Hood's house to her grandmother's house.\n")
+        }
+        else
+        {
+            printf("There is no path.\n")
+        }
+
 
     }
 
