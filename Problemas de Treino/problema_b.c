@@ -2,48 +2,77 @@
 #include <stdio.h>
 #include <string.h>
 
+
+int max(int a, int b) { return (a > b)? a : b; }
+
 int main(int argc, char const *argv[]) {
 
   int sum = 0;
   int sub_sum;
   int n_cases = 0;
   int n_coins = 0;
-  int i, j;
+  int i, j, k;
 
   scanf("%d",&n_cases);
 
-  /*SCAN THE CASE TESTES*/
+  /*SCAN THE CASE TESTS*/
   for ( i = 0; i < n_cases; i++ )
   {
 
     scanf("%d", &n_coins);
-    /*CREATE ARRAY OF COINS*/
-    int coins[n_coins];
+
+    int coins_value[n_coins];
 
     for (j = 0; j < n_coins; j++) {
-      scanf("%d", &coins[j]);
-      printf("FEZ SCAN\n");
+      scanf("%d", &coins_value[j]);
     }
 
-    /*CALCULATE THE SUM OF THE COINS*/
+    /*Create the sum of every coin*/
     for (j = 0; j < n_coins; j++) {
-      sum += coins[j];
+      sum += coins_value[j];
     }
 
-    /*GET THE OPTIMAL SOLUTION OBTAINED IN DYNAMIC TABLE*/
-    if (sum%2 != 0) {
-      /*WE HAVE TO ROUND IT*/
-      sub_sum = sum /2;
+    sub_sum = sum /2;
+
+    /*Create the dynamic_table for dynamic programming*/
+
+    int dynamic_table[sub_sum+1][n_coins+1];
+    memset(dynamic_table, 0, sizeof(dynamic_table));
+
+    /*Now we have to start filling the table. The solution will give us the maximum capacity of each sack.
+    And if the solution = sub_sum; Then it's true, and the minimum difference will be 0. Else the minimum difference
+    will be given by the difference of the total and the solution given by the dynamic table*/
+    printf("BEFORE\n");
+    for (k = 1; k < sub_sum+1; k++) {
+      for (j = 1; j < n_coins +1; j++) {
+        /*If the weight value is superior than actual weight*/
+        printf("%d ", dynamic_table[k][j]);
+      }
+      printf("\n");
     }
 
-    /*THE SUB_SUM WILL BE THE MAXIMUM CAPACITY OF THE BAG*/
+    for (k = 1; k < sub_sum+1; k++) {
+      for (j = 1; j < n_coins +1; j++) {
+        /*If the weight value is superior than actual weight*/
+        if (coins_value[k] > j) {
+          dynamic_table[k][j] = dynamic_table[k-1][j];
+        } else {
+          dynamic_table[k][j] = max(dynamic_table[k-1][j], coins_value[j] + dynamic_table[k-1][j - coins_value[j]]);
+        }
+      }
+    }
 
-    /*COINS OF THE OTHER PLAYER = SUM - SUM COINS IN THE BAG OF THE FIRST PLAYER*/
-    /*MINIMUM DIFERENCE = COINS OF THE OTHER PLAYER - COINS OF THE FIRST PLAYER*/
-    /*WE KNOW ITS MINIMUM BECAUSE THE TABLE WILL GIVE US THE SOLUTION WITH THE MAXIMUM VALUE IN THE BAG*/
+    printf("AFTER\n");
+    for (k = 1; k < sub_sum+1; k++) {
+      for (j = 1; j < n_coins +1; j++) {
+        /*If the weight value is superior than actual weight*/
+        printf("%d ", dynamic_table[k][j]);
+      }
+      printf("\n");
+    }
+
+    printf("%d\n", dynamic_table[sub_sum][n_coins] - sub_sum);
 
   }
-
-  printf("SUB SUM: %d\n", sub_sum);
   return 0;
 }
