@@ -7,13 +7,13 @@ int n_lobos;
 int heigth;
 int width;
 long int n_paths = 0;
-int dynamic_matrix[101][101];
+long int dynamic_matrix[101][101];
 
 long int countPaths(int x, int y){
 
     int i;
-    int C1 = 0;
-    int C2 = 0;
+    long int C1 = 0;
+    long int C2 = 0;
     int right = 1;
     int up = 1;
 
@@ -64,7 +64,7 @@ int main() {
         scanf("%d",&n_lobos);
         for ( i = 0; i < n_lobos; i++ ) {
             scanf("%d %d",&x,&y);
-            if ((x == 0 && y == 0) || (x == width && y == heigth)) {
+            if ((x == width && y == 0) || (x == 0 && y == heigth)) {
                 flag = 1;
             }
             cord_lobos[i][0] = width - x;
