@@ -48,24 +48,29 @@ int gcp(int v) {
     /*CICLO DOS NOS ADJACENTES*/
     for (k = 0; k < n_members; k++) {
         if (adjacency[k][v] == 1) {
-            if (colors[k] == cor) {
+            if (colors[v] == colors[k] && colors[k] == cor) {
                 feasible = 0;
                 break;
             }
         }
-    }
-    if (feasible == 1) {
-        colors[v] = cor;
-        a++;
-        if (gcp(v+1) == 1) {
-            return 1;
+
+        if (feasible == 1) {
+            colors[v] = cor;
+            a++;
+            if (gcp(v+1) == 1) {
+                return 1;
+            }
+            a--;
+            colors[v] = -1;
         }
-        colors[v] = -1;
-    }
-    if ( feasible == 0 )
-    {
-        if (gcp(v + 1) == 1 )
-            return 1;
+
+        if ( feasible == 0 ) {
+            colors[v] = -1;
+            if (gcp(v + 1) == 1 ) {
+                return 1;
+            }
+            colors[v] = cor;
+        }
     }
 
     return 0;

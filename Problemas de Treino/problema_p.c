@@ -12,7 +12,7 @@ int used_colors = 1;
 
 int main(int argc, char const *argv[])
 {
-    int i, x, y;
+    int i, x, y, j;
     scanf("%d %d",&n_exames, &n_cases);
 
     memset(adjacency, 0,sizeof(adjacency));
@@ -23,10 +23,17 @@ int main(int argc, char const *argv[])
         adjacency[x][y] = 1;
         adjacency[y][x] = 1;
     }
+
     if (n_exames == 0 || n_cases == 0) {
         used_colors = 0;
     } else {
-        gcp(0);
+        for (j = 0; j < n_exames; j++) {
+            memset(colors, -1,sizeof(colors));
+            colors[j] = 1;
+            gcp(j);
+            colors[j] = -1;
+        }
+
     }
 
     printf("%d\n", used_colors);
