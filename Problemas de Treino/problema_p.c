@@ -9,7 +9,7 @@ int min_colors = 0;
 int colors[26];
 int adjacency[26][26];
 int gcp(int v);
-int cor = 0;
+
 
 int main(int argc, char const *argv[])
 {
@@ -33,14 +33,14 @@ int main(int argc, char const *argv[])
 }
 
 int gcp(int v) {
-    int  k, feasible;
+    int  k, feasible,cor;
 
     if (v == n_exames + 1) {
         return 1;
     }
 
     /*CICLO DAS CORES*/
-    for (; cor < n_exames; ++cor) {
+    for (cor = 1; cor < n_exames + 1; ++cor) {
         feasible = 1;
         /*CICLO DOS NOS ADJACENTES*/
         for (k = 0; k < n_exames; k++) {
