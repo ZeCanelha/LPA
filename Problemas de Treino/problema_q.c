@@ -5,36 +5,42 @@
 
 int n_members = 0;
 int n_connections = 0;
-int colors[26];
+int colors[10];
 int cor = 1;
 int adjacency[26][26];
 int gcp(int v);
+int a  = 0;
+int max = 0;
 
 int main(int argc, char const *argv[])
 {
     int i, x, y;
-        scanf("%d %d",&n_members, &n_connections);
+    scanf("%d %d",&n_members, &n_connections);
 
-        memset(adjacency, 0,sizeof(adjacency));
+    memset(adjacency, 0,sizeof(adjacency));
+
+
+    for (i = 0; i < n_connections; i++) {
+        scanf("%d %d",&x, &y);
+        adjacency[x][y] = 1;
+        adjacency[y][x] = 1;
+    }
+    for ( i = 0; i < n_connections; i++)
+    {
         memset(colors, -1,sizeof(colors));
-
-        for (i = 0; i < n_connections; i++) {
-            scanf("%d %d",&x, &y);
-            adjacency[x][y] = 1;
-            adjacency[y][x] = 1;
-        }
-
-    gcp(0);
-
-    printf("%d\n", n_pintados);
-
+        gcp(i);
+    }
+    printf("%d\n",max);
     return 0;
 }
 
 int gcp(int v) {
-    int  k, feasible,i;
+    int  k, feasible;
 
-    if (v == n_members + 1) {
+    if (v == n_members) {
+        if ( a > max )
+            max = a;
+        a = 0;
         return 1;
     }
 
@@ -50,10 +56,17 @@ int gcp(int v) {
     }
     if (feasible == 1) {
         colors[v] = cor;
+        a++;
         if (gcp(v+1) == 1) {
             return 1;
         }
         colors[v] = -1;
+    }
+
+    if ( feasible == 0 )
+    {
+        if (gcp(v + 1) == 1 )
+            return 1;
     }
 
     return 0;
