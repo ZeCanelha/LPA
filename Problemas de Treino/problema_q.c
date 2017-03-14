@@ -5,9 +5,9 @@
 
 int n_members = 0;
 int n_connections = 0;
-int colors[10];
+int colors[1000];
 int cor = 1;
-int adjacency[26][26];
+int adjacency[1000][1000];
 int gcp(int v);
 int a  = 0;
 int max = 0;
@@ -25,7 +25,7 @@ int main(int argc, char const *argv[])
         adjacency[x][y] = 1;
         adjacency[y][x] = 1;
     }
-    for ( i = 0; i < n_connections; i++)
+    for ( i = 0; i < n_members; i++)
     {
         memset(colors, -1,sizeof(colors));
         gcp(i);
@@ -62,7 +62,6 @@ int gcp(int v) {
         }
         colors[v] = -1;
     }
-
     if ( feasible == 0 )
     {
         if (gcp(v + 1) == 1 )
