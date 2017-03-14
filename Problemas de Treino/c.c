@@ -24,13 +24,11 @@ long int countPaths(int x, int y){
 
     if ( x == 0 && y != heigth )
     {
-        printf("A verificar se há lobos ao lado\n");
         for ( i = 0; i < n_lobos; i++) {
             for( j = y; y < heigth; j++)
             {
                 if (cord_lobos[i][1] == j  && cord_lobos[i][0] == x ) {
-                    printf("Encontrei 1 ao lado\n");
-                    return -1;
+                    return 0;
                 }
             }
         }
@@ -38,13 +36,11 @@ long int countPaths(int x, int y){
     }
     if ( x != 0 && y == heigth )
     {
-        printf("A verificar se há lobos em cima\n");
         for ( i = 0; i < n_lobos; i++) {
             for ( j = x; j > 0; j-- )
             {
                 if (cord_lobos[i][0] == j && cord_lobos[i][1] == y) {
-                    printf("Encontrei 1\n");
-                    return - 1;
+                    return 0;
                 }
             }
         }
@@ -56,7 +52,6 @@ long int countPaths(int x, int y){
         C1 = countPaths(x-1, y);
 
     } else {
-        printf("My current location (%d,%d)\n",x,y);
         for ( i = 0; i < n_lobos; i++) {
 
             if (cord_lobos[i][0] == (x - 1) && cord_lobos[i][1] == y) {
@@ -80,7 +75,7 @@ long int countPaths(int x, int y){
 
 int main() {
 
-    int i,j;
+    int i;
     int x , y;
     while(1) {
         scanf("%d %d",&width,&heigth);
@@ -106,15 +101,6 @@ int main() {
             printf("There is no path.\n");
         }
 
-        for ( i = 0; i < width; i++ )
-        {
-            printf("[ ");
-            for (j = 0; j < heigth; j++ )
-            {
-                printf("%ld ",dynamic_matrix[i][j]);
-            }
-            printf("]\n");
-        }
     }
 
 
