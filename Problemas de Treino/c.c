@@ -24,13 +24,16 @@ long int countPaths(int x, int y){
 
     if ( x == 0 && y != heigth )
     {
+
         for ( i = 0; i < n_lobos; i++) {
-            for( j = y; y < heigth; j++)
+            for( j = y; j < heigth; j++)
             {
                 if (cord_lobos[i][1] == j  && cord_lobos[i][0] == x ) {
+
                     return 0;
                 }
             }
+
         }
         return 1;
     }
@@ -100,6 +103,7 @@ int main() {
         } else {
             printf("There is no path.\n");
         }
+
 
     }
 
