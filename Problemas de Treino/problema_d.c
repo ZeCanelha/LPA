@@ -2,61 +2,104 @@
 #include <stdlib.h>
 #include <string.h>
 
+int count = 0;
+int can_run = 1;
+int dynamic_matrix[26][100];
+int moedas[26];
+int quantia = 0;
+int n_moedas = 0;
+
+void subset ();
 
 
 int main(int argc, char const *argv[]) {
 
     int test_cases;
     int i,j,k;
-    int quantia;
-    int n_moedas;
-    int usa_moeda;
-    int n_usa_moeda;
+
 
     scanf("%d",&test_cases);
 
-    for ( j = 0; j < test_cases; j++ )
+    for ( k = 0; k < test_cases; k++ )
     {
-        scanf("%d %d",&quantia,&n_moedas );
-        int dynamic_matrix[n_moedas][quantia];
-        memset(dynamic_matrix, 0, sizeof(dynamic_matrix));
-        int moedas[n_moedas];
-        for ( i = 0; i < n_moedas; i++ )
+        scanf("%d %d", &quantia, &n_moedas);
+
+        memset(dynamic_matrix, 0 , sizeof(dynamic_matrix));
+        moedas[0] = 0;
+        for ( j = 1; j < n_moedas + 1; j++ )
         {
-            scanf("%d ", &moedas[i]);
+            scanf("%d",&moedas[j]);
         }
 
-        for ( i = 0; i < n_moedas; i++ )
-        {
-            dynamic_matrix[i][0] = 0;
-        }
-        for ( i = 0; i < quantia; i++ )
-        {
-            dynamic_matrix[0][i] = 0;
-        }
+        subset();
 
-        for ( i = 1; i < n_moedas; i++ )
+        for ( i = 0; i < n_moedas + 1; i++ )
         {
-            for ( k = 1; k < quantia; k++ )
+            printf("[ ");
+            for ( j = 0; j < quantia + 1; j++ )
             {
-                /* Se não der , tentar com i -1 , problema do algortimo anterior */
-
-                if ( moedas[i] > k  )
-                {
-                    dynamic_matrix[i][k] = dynamic_matrix[i-1][k];
-                    n_usa_moeda = dynamic_matrix[i-1][k];
-                }
-                else
-                {
-                    usa_moeda = 1 + dynamic_matrix[i][j - moedas[i]];
-                    dynamic_matrix[i][k] = usa_moeda + n_usa_moeda;
-                }
+                printf(" %d ", dynamic_matrix[i][j]);
             }
+            printf("]\n");
         }
-
-        printf(" solution: %d\n", dynamic_matrix[n_moedas][quantia-1]);
-
     }
 
     return 0;
+}
+
+
+void subset ()
+{
+
+    int i,j,z;
+    for ( i = 0; i < n_moedas + 1; i++ )
+    {
+        dynamic_matrix[i][0] = 1;
+    }
+
+    for ( j = 1; j < quantia + 1; j++ )
+    {
+        dynamic_matrix[0][j] = 0;
+    }
+
+    for ( i = 1; i <= n_moedas; i++ )
+    {
+        for ( j = 1; j <= quantia; j++ )
+        {
+            /* Se berrar penso que seja só alterar a moedas[0] e aqui começar em i - 1 */
+            if ( moedas[i] > j )
+            {
+                dynamic_matrix[i][j] = dynamic_matrix[i - 1][j];
+            }
+            else
+            {
+                /* Nãp usar a moeda */
+                if ( dynamic_matrix[i - 1][j] == 1 )
+                {
+                    dynamic_matrix[i][j] = dynamic_matrix[i - 1][j];
+                }
+                /* Usar a moeda */
+                if ( dynamic_matrix[i - 1][j-moedas[i]] == 1 )
+                {
+                    dynamic_matrix[i][j] = dynamic_matrix[i - 1][j - moedas[i]];
+                }
+            }
+        }
+    }
+    /* Se em cima for falso, a moeda i foi usada */
+    can_run = 0;
+    int aux = j -1;
+    for (z = i - 1; z > 0; z--)
+    {
+        if ( dynamic_matrix[z -1][aux] == 1  )
+        {
+            continue;
+        }
+        if ( dynamic_matrix[z -1][aux] == 0 )
+        {
+            printf("Usei %d\n", moedas[z]);
+            aux = aux - moedas[z];
+            /* moeda usada neste ciclo , cortada no prox */
+        }
+    }
 }
