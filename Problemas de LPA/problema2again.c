@@ -39,9 +39,8 @@ int main(int argc, char const *argv[])
         }
 
         for ( r = 1; r < budget + 1; r++) {
-            printf("%ld\n", r);
+            
             for ( j = 1; j < n_operations + 1; j++) {
-                printf("J: %ld\n", j);
                 dp_matrix[r][j] = calculaMax(r, j, dp_matrix);
             }
         }
