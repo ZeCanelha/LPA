@@ -30,16 +30,16 @@ int main(int argc, char const *argv[])
 
     double dp_matrix[n_operations+1][budget+1];
     if (n_operations != 0 || impossible != 0) {
-        for (i = 1; i < n_operations+1; i++) {
+        for (i = 1; i < budget+1; i++) {
             dp_matrix[0][i] = 0;
         }
 
-        for (i = 1; i < budget+1; i++) {
+        for (j = 1; j < n_opearations+1; j++) {
             dp_matrix[i][1] = probabilities[1];
         }
 
         for ( r = 1; r < budget + 1; r++) {
-            
+
             for ( j = 1; j < n_operations + 1; j++) {
                 dp_matrix[r][j] = calculaMax(r, j, dp_matrix);
             }
@@ -60,8 +60,8 @@ int main(int argc, char const *argv[])
 long int calculaMax(long int i, long int j, double dp_matrix[n_operations+1][budget+1]) {
     int z, maximo = 0;
     for (z = 1; z < i/costs[j]; z++) {
-            if (maximo < dp_matrix[i-costs[j]*z][j-1] * (1-myPow(1 - probabilities[j], z))){
-                maximo = dp_matrix[i-costs[j]*z][j-1] * (1-myPow(1 - probabilities[j], z));
+            if (maximo < dp_matrix[i][j-1] * (1-myPow(1 - probabilities[j], z))){
+                maximo = dp_matrix[i][j-1] * (1-myPow(1 - probabilities[j], z));
             }
 
     }
