@@ -11,14 +11,15 @@ int cheapest_machine = 10000000;
 long int initialBill = 0;
 
 long int calculaMax(long int i, long int j, double dp_matrix[n_operations+1][budget+1]);
-double myPow(long int a, long int b);
+double myPow(double a, long int b);
 long int sum( int j);
-long int product(int j);
+double product(int j);
 double max(double a, double b) { return (a > b)? a : b; }
 
 int main(int argc, char const *argv[])
 {
-    long int i, j, b, tmp;
+    long int i, j, b;
+    double tmp;
     scanf("%d",&n_operations);
 
     for (i = 1; i < n_operations +1; i++) {
@@ -30,7 +31,7 @@ int main(int argc, char const *argv[])
 
     /*budget = budget - initialBill;*/
 
-    double dp_matrix[n_operations+1][budget+1];
+    double dp_matrix[budget+1][n_operations+1];
     long int redundantCopies[n_operations+1];
 
     if (n_operations != 0 || impossible != 0) {
@@ -58,7 +59,7 @@ int main(int argc, char const *argv[])
     printf("-------------------MATRIZ DINAMICA---------------\n" );
     for (i = 1; i <= n_operations; i++) {
         for ( j = 1; j <= budget; j++) {
-            printf("%lf ", dp_matrix[i][j]);
+            printf("%.12lf ", dp_matrix[i][j]);
         }
         printf("\n" );
     }
@@ -82,7 +83,7 @@ int main(int argc, char const *argv[])
     return maximo;
 }*/
 
-double myPow(long int a, long int b){
+double myPow(double a, long int b){
     int total = 1, l;
     for ( l = 0; l < b; l++) {
         total *= a;
@@ -100,8 +101,9 @@ long int sum( int j){
     return total;
 }
 
-long int product(int j){
-    int total = 1, i;
+double product(int j){
+    double total = 1;
+    int i;
     for (i = 1; i <= j; i++) {
         total *= probabilities[i];
     }
