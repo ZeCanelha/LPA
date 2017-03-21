@@ -12,8 +12,8 @@ long int initialBill = 0;
 
 long int calculaMax(long int i, long int j, double dp_matrix[n_operations+1][budget+1]);
 double myPow(double a, long int b);
-long int sum( int j);
-double product(int j);
+long int sum( long int j);
+double product(long int j);
 double max(double a, double b) { return (a > b)? a : b; }
 
 int main(int argc, char const *argv[])
@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
     double tmp;
     scanf("%d",&n_operations);
 
-    for (i = 1; i < n_operations +1; i++) {
+    for (i = 1; i <= n_operations; i++) {
         scanf("%lf %ld",&probabilities[i],&costs[i]);
         /*initialBill += costs[i];*/
     }
@@ -56,6 +56,7 @@ int main(int argc, char const *argv[])
             }
         }
     }
+    /*
     printf("-------------------MATRIZ DINAMICA---------------\n" );
     for (i = 1; i <= n_operations; i++) {
         for ( j = 1; j <= budget; j++) {
@@ -67,24 +68,14 @@ int main(int argc, char const *argv[])
     printf("-------------------NUMERO DE MAQUINAS PARA CADA SETOR ----------\n" );
     for (i = 1; i < n_operations; i++) {
         printf("%ld ", redundantCopies[i]);
-    }
+    }*/
     printf("%.12lf\n",dp_matrix[budget][n_operations]);
     return 0;
 }
 
-/*long int calculaMax(long int i, long int j, double dp_matrix[n_operations+1][budget+1]) {
-    int z, maximo = 0;
-    for (z = 1; z < i/costs[j]; z++) {
-            if (maximo < dp_matrix[i][j-1] * (1-myPow(1 - probabilities[j], z))){
-                maximo = dp_matrix[i][j-1] * (1-myPow(1 - probabilities[j], z));
-            }
-
-    }
-    return maximo;
-}*/
-
 double myPow(double a, long int b){
-    int total = 1, l;
+    double total = 1;
+    int l;
     for ( l = 0; l < b; l++) {
         total *= a;
     }
@@ -92,7 +83,7 @@ double myPow(double a, long int b){
     return total;
 }
 
-long int sum( int j){
+long int sum(long int j){
     int total = 0, i;
     for (i = 1; i <= j; i++) {
         total += costs[i];
@@ -101,7 +92,7 @@ long int sum( int j){
     return total;
 }
 
-double product(int j){
+double product(long int j){
     double total = 1;
     int i;
     for (i = 1; i <= j; i++) {
