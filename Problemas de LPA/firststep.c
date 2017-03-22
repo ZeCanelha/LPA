@@ -10,13 +10,14 @@ long int costs[401];
 long int initialBill = 0;
 int impossible = 0;
 
+
 long int calculaMax(long int i, long int j, double dp_matrix[n_operations+1][budget+1]);
 double myPow(double a, long int b);
-double[] max(double a, double b) {return (a > b)? a : b; }
+double max(double a, double b) {return (a > b)? a : b; }
 
 int main(int argc, char const *argv[])
 {
-    double prob;
+    double prob, tmp;
     long int i, j, k;
     double temp = 0;
     scanf("%d",&n_operations);
@@ -35,8 +36,14 @@ int main(int argc, char const *argv[])
     budget = budget - initialBill;
 
     double dp_matrix[n_operations][budget + 1];
+    long int redundantMachines[n_operations];
+
     dp_matrix[0][0] = probabilities[1];
     if (n_operations != 0 && impossible == 0) {
+
+        for (i = 0; i < n_operations; i++) {
+            redundantMachines[i] = 1;
+        }
 
         for(i = 1; i <= budget; i++)
         {
@@ -55,25 +62,28 @@ int main(int argc, char const *argv[])
             {
                 /* Calcular a pobabilidade de sucesso de uma maquina pelas restantes */
                 dp_matrix[i][j] = dp_matrix[i-1][j] * probabilities[i+1];
-                prob = 1 - probabilities[i + 1];
+                prob = 1 - probabilities[i + 1 ];
 
                 for ( k = 1; k <= (j/costs[i+1]); k++ ) {
-                    prob *= (1 - probabilities[i + 1]);
-                    dp_matrix [i][j] = max(dp_matrix [i][j],dp_matrix[i-1][j-costs[i+1]*k] * (1 - prob));
-                    
+                    prob *= (1 - probabilities[i + 1 ]);
+                    dp_matrix[i][j] = max(dp_matrix [i][j], dp_matrix[i-1][j-costs[i+1]*k] * (1 - prob));
                 }
-                printf("OLHA O I e o K: %ld %ld\n", i, k);
             }
         }
 
     }
-    printf("-------------------MATRIZ DINAMICA---------------\n" );
+
+    for (i = 0; i < n_operations; i++) {
+        printf("%ld ", redundantMachines[i]);
+    }
+    printf("\n");
+    /*printf("-------------------MATRIZ DINAMICA---------------\n" );
     for (i = 0; i < n_operations; i++) {
         for ( j = 0; j <= budget; j++) {
             printf("%.12lf ", dp_matrix[i][j]);
         }
         printf("\n" );
-    }
+    }*/
 
     printf("%.12lf\n",dp_matrix[n_operations-1][budget]);
     return 0;
