@@ -6,6 +6,7 @@ int n_operations = 0;
 long int budget = 0;
 double probabilities[401];
 long int costs[401];
+long int currentBill=0;
 
 
 double myPow(double a, long int b);
@@ -20,10 +21,9 @@ int main(int argc, char const *argv[])
 
     for (i = 1; i <= n_operations; i++) {
         scanf("%lf %ld",&probabilities[i],&costs[i]);
+
     }
-
     scanf("%ld",&budget);
-
 
     double dp_matrix[budget+1][n_operations+1];
     long int redundantCopies[n_operations+1];
@@ -53,20 +53,6 @@ int main(int argc, char const *argv[])
         }
     }
 
-    /*printf("-------------------MATRIZ DINAMICA---------------\n" );
-    for (i = 1; i <= n_operations; i++) {
-        for ( j = 1; j <= budget; j++) {
-            printf("%.32lf ", dp_matrix[i][j]);
-        }
-        printf("\n" );
-    }*/
-
-    printf("-------------------NUMERO DE MAQUINAS PARA CADA SETOR ----------\n" );
-    for (i = 1; i <= n_operations; i++) {
-        printf("%ld ", redundantCopies[i]);
-    }
-
-    printf("\n" );
     printf("%.12lf\n",dp_matrix[budget][n_operations]);
     return 0;
 }
