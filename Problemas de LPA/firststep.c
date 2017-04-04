@@ -2,31 +2,34 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#define PRECISION 2.220446e-16
 
-int n_operations = 0;
+/*GLOBAL VARIABLES*/
+long int n_operations = 0;
 long int budget = 0;
-double probabilities[401];
-long int costs[401];
 long int initialBill = 0;
 int impossible = 0;
+double failureProb;
 
+/*PROTOTYPES*/
+int compareDoubles(double a, double b);
+long double max(long double a, long double b);
+long double myPow(long double a, long int b);
+void myRecursion(long double dp[n_operations][budget+1],double value[],long int weight[], int i,int line, int array[]);
 
-long int calculaMax(long int i, long int j, double dp_matrix[n_operations+1][budget+1]);
-double myPow(double a, long int b);
-double max(double a, double b) {return (a > b)? a : b; }
+/*MAIN FUNCTION*/
+int main(){
+    double probabilities[401];
+    long int costs[401];
+    int f, j;
+    long int i,z;
 
-int main(int argc, char const *argv[])
-{
-    double prob, tmp;
-    long int i, j, k;
-    double temp = 0;
-    scanf("%d",&n_operations);
+    scanf("%ld",&n_operations);
 
-
-    for (i = 1; i < n_operations +1; i++) {
-        scanf("%lf %ld",&probabilities[i],&costs[i]);
-        initialBill += costs[i];
-        if (probabilities[i] == 0) {
+    for (f = 1; f < n_operations+1; f++){
+        scanf("%lf %ld",&probabilities[f],&costs[f]);
+        initialBill += costs[f];
+        if (probabilities[f] == 0) {
             impossible = 1;
         }
     }
@@ -35,62 +38,88 @@ int main(int argc, char const *argv[])
 
     budget = budget - initialBill;
 
-    double dp_matrix[n_operations][budget + 1];
-    long int redundantMachines[n_operations];
+    int redundantMachines[n_operations+1];
+    long double dp_matrix[n_operations][budget+1];
 
-    dp_matrix[0][0] = probabilities[1];
     if (n_operations != 0 && impossible == 0) {
 
-        for (i = 0; i < n_operations; i++) {
-            redundantMachines[i] = 1;
+        dp_matrix[0][0] = probabilities[1];
+        /*initializing first row*/
+        for(i = 1;i <= budget; ++i){
+            dp_matrix[0][i] = (1 - myPow(1-probabilities[1],i/costs[1] + 1));
         }
-
-        for(i = 1; i <= budget; i++)
-        {
-            temp = i/costs[1];
-            dp_matrix[0][i] = (1 - myPow(1- probabilities[1],temp+1));
-        }
-
-        for( j=1; j < n_operations; j++){
+        /*initializing first column*/
+        for(j = 1; j < n_operations; ++j){
             dp_matrix[j][0] = probabilities[j+1] * dp_matrix[j-1][0];
         }
 
-
-        for ( i = 1; i < n_operations; i++) {
-
-            for ( j = 1; j <=budget; j++)
-            {
-                /* Calcular a pobabilidade de sucesso de uma maquina pelas restantes */
+        /*Filling the dynamic Table*/
+        for (i = 1; i < n_operations; ++i){
+            for (j = 1; j <= budget; ++j){
                 dp_matrix[i][j] = dp_matrix[i-1][j] * probabilities[i+1];
-                prob = 1 - probabilities[i + 1 ];
+                failureProb = 1 - probabilities[i+1];
 
-                for ( k = 1; k <= (j/costs[i+1]); k++ ) {
-                    prob *= (1 - probabilities[i + 1 ]);
-                    dp_matrix[i][j] = max(dp_matrix [i][j], dp_matrix[i-1][j-costs[i+1]*k] * (1 - prob));
+                for(z = 1; z <= j/costs[i+1]; z++){
+                    failureProb *= (1-probabilities[i+1]);
+                    dp_matrix[i][j] = max(dp_matrix[i][j], dp_matrix[i-1][j - (z * costs[i+1])] * (1 - failureProb));
                 }
             }
         }
 
+        printf("%.12Lf\n",dp_matrix[n_operations-1][budget]);
+
+        /*calculating redundant machines*/
+        myRecursion(dp_matrix, probabilities, costs, n_operations-1, budget, redundantMachines);
     }
 
-    for (i = 0; i < n_operations; i++) {
-        printf("%ld ", redundantMachines[i]);
-    }
-    printf("\n");
-    /*printf("-------------------MATRIZ DINAMICA---------------\n" );
-    for (i = 0; i < n_operations; i++) {
-        for ( j = 0; j <= budget; j++) {
-            printf("%.12lf ", dp_matrix[i][j]);
-        }
-        printf("\n" );
-    }*/
-
-    printf("%.12lf\n",dp_matrix[n_operations-1][budget]);
     return 0;
 }
 
-double myPow(double a, long int b){
-    double total = 1;
+
+/*AUXILIAR METHODS*/
+void myRecursion(long double dp[n_operations][budget+1],double value[],long int weight[],int i,int line, int array[]){
+    int a,k;
+    int price;
+    double probz;
+
+    if(i == 0){
+        array[1] = (line/weight[1])+1;
+        for(a=1; a<n_operations+1; a++){
+            printf("%d%s", array[a], a!=n_operations-1?" ":"");
+        }
+
+        printf("\n");
+        return;
+    }
+
+    probz = (1-value[i+1]);
+
+    for(k=1;k<line/weight[i+1];k++){
+
+        probz *= (1-value[i+1]);
+
+        if(compareDoubles(dp[i][line] , dp[i-1][line - ((k) * weight[i+1])] * (1 - probz))){
+
+            price = (weight[i+1] * k);
+
+            array[i] = k+1;
+
+            myRecursion(dp,value,weight,i-1,line-price, array);
+        }
+    }
+}
+
+
+long double max(long double a, long double b) {
+    return (a > b)? a : b;
+}
+
+int compareDoubles(double a, double b){
+    return fabs(a - b) < PRECISION;
+}
+
+long double myPow(long double a, long int b){
+    long double total = 1;
     int l;
     for ( l = 0; l < b; l++) {
         total *= a;
