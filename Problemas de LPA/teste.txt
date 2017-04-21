@@ -3,6 +3,7 @@ maximize
 st
 25x9-57x3+76x4=4
 -45x3-11x2+23x1<=57
+23x1-33x10>=40
 BINARY
 
 minimize
