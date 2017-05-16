@@ -22,8 +22,8 @@ int main(int argc, char const *argv[])
     scanf("%d %d",&n_places,&n_transactions);
     getchar();
 
-    int ingoing_nodes[n_transactions][n_places];
-    int outgoing_nodes[n_transactions][n_places];
+    int ingoing_nodes[n_transactions+1][n_places+1];
+    int outgoing_nodes[n_transactions+1][n_places+1];
 
     memset(&ingoing_nodes,0,sizeof(ingoing_nodes));
     memset(&outgoing_nodes,0,sizeof(outgoing_nodes));
@@ -51,19 +51,19 @@ int main(int argc, char const *argv[])
             }
             else
             {
-                ingoing_nodes[n2][n1] = 1;
+                ingoing_nodes[n1][n2] = 1;
             }
         }
     }
 
     /* DEBUG: imprimir a matriz de "adjacencia" */
     int i,j;
-    for ( i = 0; i < n_transactions; i++ )
+    for ( i = 1; i <= n_transactions; i++ )
     {
         printf("[");
-        for ( j = 0; j < n_places; j++ )
+        for ( j = 1; j <= n_places; j++ )
         {
-            printf(" %d ",ingoing_nodes[i][j]);
+            printf(" %d ",outgoing_nodes[i][j]);
         }
         printf("]\n");
     }
