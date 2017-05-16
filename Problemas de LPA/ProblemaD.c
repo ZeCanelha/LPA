@@ -9,18 +9,23 @@ int main(int argc, char const *argv[])
     int n_places;
     int n_transactions;
     char input_reader[20];
+    int k;
+
     char * aux;
     int n1, n2, n3;
 
-    /*
+    /* TODO:
      *
      * Quando o ultimo numero for 2 corresponde ás ligações do nó a transição *
      * Quando o ultimo numero for 1 corresponde ás ligações da transição para o nó *
+     * Verificar se é necessario uma matriz para guardar os diferentes estados para ver os ciclos
      *
     */
 
     scanf("%d %d",&n_places,&n_transactions);
     getchar();
+
+    int curr_state[n_places];
 
     int ingoing_nodes[n_transactions+1][n_places+1];
     int outgoing_nodes[n_transactions+1][n_places+1];
@@ -47,16 +52,24 @@ int main(int argc, char const *argv[])
 
             if ( n3 == 1 )
             {
-                outgoing_nodes[n1][n2] = 1;
+                outgoing_nodes[n1][n2] += 1;
             }
             else
             {
-                ingoing_nodes[n1][n2] = 1;
+                ingoing_nodes[n1][n2] += 1;
             }
         }
     }
 
-    /* DEBUG: imprimir a matriz de "adjacencia" */
+    for( k = 0; k < n_places; k++ )
+    {
+        scanf("%d",&curr_state[k]);
+    }
+
+
+
+    /* DEBUG: imprimir a matriz de "adjacencia"*/
+
     int i,j;
     for ( i = 1; i <= n_transactions; i++ )
     {
