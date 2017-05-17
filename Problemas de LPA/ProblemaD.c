@@ -11,12 +11,12 @@ int main(int argc, char const *argv[])
     int n_places;
     int n_transactions;
     char input_reader[20];
-    int k;
+    int i,j,k;
     int * trigger_matrix;
     char * aux;
     int n1, n2, n3;
+    int sum = 0;
 
-    int i,j;
 
     /* TODO:
      *
@@ -34,6 +34,7 @@ int main(int argc, char const *argv[])
     int ingoing_nodes[n_transactions+1][n_places+1];
     int outgoing_nodes[n_transactions+1][n_places+1];
     int d_matrix[n_transactions + 1][n_places+1];
+    int state_matrix[n_transactions + 1][n_places + 1];
 
     memset(&ingoing_nodes,0,sizeof(ingoing_nodes));
     memset(&outgoing_nodes,0,sizeof(outgoing_nodes));
@@ -73,27 +74,29 @@ int main(int argc, char const *argv[])
 
     for (i = 1; i <= n_transactions; i++) {
       for (j = 1;  j <= n_places; j++) {
-        d_matrix[i][j] = ingoing_nodes[i][j] - outgoing_nodes[i][j];
+        d_matrix[i][j] = outgoing_nodes[i][j] - ingoing_nodes[i][j];
       }
     }
 
-    for ( i = 1; i <= n_transactions; i++ )
+    trigger_matrix = can_fire(ingoing_nodes,curr_state[0],n_transactions,n_places);
+
+
+    printf("State\n[");
+    for ( i = 1; i <= 1; i++ )
     {
-        printf("[");
         for ( j = 1; j <= n_places; j++ )
         {
-            printf(" %d ",ingoing_nodes[i][j]);
+            for ( k = 1; k <= n_transactions; k++ )
+            {
+                sum += *(trigger_matrix + k) * d_matrix[k][j];
+            }
+            state_matrix[i][j] = sum + curr_state[0][j-1];
+            printf(" %d ",state_matrix[i][j]);
+            sum = 0;
         }
-        printf("]\n");
     }
-
-
-
-    trigger_matrix = can_fire(ingoing_nodes,curr_state[0],n_transactions,n_places);
-    printf("[");
-    for ( i = 1; i <= n_transactions; i++)
-        printf(" %d ", *(trigger_matrix+i) );
     printf("]\n");
+
 
 
 
@@ -113,11 +116,12 @@ int * can_fire( int ingoing_nodes[5][5] , int state[5], int n_transactions, int 
             {
                 if ( state[j-1] >= ingoing_nodes[i][j] )
                 {
-                    //printf("State de p%d -> Arcos: %d\n",j,ingoing_nodes[i][j]);
                     trigger = 1;
                 }
                 else
+                {
                     trigger = 0;
+                }
             }
         }
         *(triggers+i) = trigger;
@@ -141,4 +145,8 @@ for ( i = 1; i <= n_transactions; i++ )
     printf("]\n");
 }
 
+printf("[");
+for ( i = 1; i <= n_transactions; i++)
+    printf(" %d ", *(trigger_matrix+i) );
+printf("]\n");
 */
