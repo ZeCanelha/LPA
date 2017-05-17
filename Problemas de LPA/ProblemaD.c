@@ -14,6 +14,8 @@ int main(int argc, char const *argv[])
     char * aux;
     int n1, n2, n3;
 
+    int i,j;
+
     /* TODO:
      *
      * Quando o ultimo numero for 2 corresponde ás ligações do nó a transição *
@@ -25,10 +27,11 @@ int main(int argc, char const *argv[])
     scanf("%d %d",&n_places,&n_transactions);
     getchar();
 
-    int curr_state[n_places];
+    int curr_state[50][n_places];
 
     int ingoing_nodes[n_transactions+1][n_places+1];
     int outgoing_nodes[n_transactions+1][n_places+1];
+    int d_matrix[n_transactions + 1][n_places+1];
 
     memset(&ingoing_nodes,0,sizeof(ingoing_nodes));
     memset(&outgoing_nodes,0,sizeof(outgoing_nodes));
@@ -56,31 +59,54 @@ int main(int argc, char const *argv[])
             }
             else
             {
-                ingoing_nodes[n1][n2] += 1;
+                ingoing_nodes[n2][n1] += 1;
             }
         }
     }
 
     for( k = 0; k < n_places; k++ )
     {
-        scanf("%d",&curr_state[k]);
+        scanf("%d",&curr_state[0][k]);
     }
 
+    for (i = 1; i <= n_transactions; i++) {
+      for (j = 1;  j <= n_places; j++) {
+        d_matrix[i][j] = ingoing_nodes[i][j] - outgoing_nodes[i][j];
+      }
+    }
 
-
-    /* DEBUG: imprimir a matriz de "adjacencia"*/
-
-    int i,j;
     for ( i = 1; i <= n_transactions; i++ )
     {
         printf("[");
         for ( j = 1; j <= n_places; j++ )
         {
-            printf(" %d ",outgoing_nodes[i][j]);
+            printf(" %d ",d_matrix[i][j]);
         }
         printf("]\n");
     }
 
 
+
+
+
+
     return 0;
 }
+
+
+
+
+/* DEBUG: imprimir a matriz de "adjacencia"
+
+int i,j;
+for ( i = 1; i <= n_transactions; i++ )
+{
+    printf("[");
+    for ( j = 1; j <= n_places; j++ )
+    {
+        printf(" %d ",ingoing_nodes[i][j]);
+    }
+    printf("]\n");
+}
+
+*/
