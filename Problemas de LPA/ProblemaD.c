@@ -23,6 +23,7 @@ int main(int argc, char const *argv[])
      * Quando o ultimo numero for 2 corresponde ás ligações do nó a transição *
      * Quando o ultimo numero for 1 corresponde ás ligações da transição para o nó *
      * Função para calcular as transições que podem ser disparadas
+     * A matrix de trigger tem q ser calculada em separado
      *
     */
 
@@ -67,7 +68,7 @@ int main(int argc, char const *argv[])
         }
     }
 
-    for( k = 0; k < n_places; k++ )
+    for( k = 1; k <= n_places; k++ )
     {
         scanf("%d",&curr_state[0][k]);
     }
@@ -90,7 +91,7 @@ int main(int argc, char const *argv[])
             {
                 sum += *(trigger_matrix + k) * d_matrix[k][j];
             }
-            state_matrix[i][j] = sum + curr_state[0][j-1];
+            state_matrix[i][j] = sum + curr_state[0][j];
             printf(" %d ",state_matrix[i][j]);
             sum = 0;
         }
@@ -114,7 +115,7 @@ int * can_fire( int ingoing_nodes[5][5] , int state[5], int n_transactions, int 
         {
             if( ingoing_nodes[i][j] > 0 )
             {
-                if ( state[j-1] >= ingoing_nodes[i][j] )
+                if ( state[j] >= ingoing_nodes[i][j] )
                 {
                     trigger = 1;
                 }
