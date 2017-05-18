@@ -3,7 +3,8 @@
 #include <string.h>
 
 
-int * can_fire(int ingoing_nodes[5][5], int state[5], int n_transactions, int n_places);
+int can_fire(int ingoing_nodes[6][6], int state[6], int n_transactions, int n_places, int i);
+int build_tree(int n_transactions, int n_places, int d_matrix[6][6],int trigger_matrix[4], int curr_state[100][6],int init_state, int ingoing_nodes[6][6] );
 
 
 int main(int argc, char const *argv[])
@@ -12,11 +13,9 @@ int main(int argc, char const *argv[])
     int n_transactions;
     char input_reader[20];
     int i,j,k;
-    int * trigger_matrix;
     char * aux;
+    int trigger_matrix[4];
     int n1, n2, n3;
-    int sum = 0;
-
 
     /* TODO:
      *
@@ -30,15 +29,15 @@ int main(int argc, char const *argv[])
     scanf("%d %d",&n_places,&n_transactions);
     getchar();
 
-    int curr_state[50][n_places];
+    int curr_state[100][6];
 
-    int ingoing_nodes[n_transactions+1][n_places+1];
-    int outgoing_nodes[n_transactions+1][n_places+1];
-    int d_matrix[n_transactions + 1][n_places+1];
-    int state_matrix[n_transactions + 1][n_places + 1];
+    int ingoing_nodes[6][6];
+    int outgoing_nodes[6][6];
+    int d_matrix[6][6];
 
     memset(&ingoing_nodes,0,sizeof(ingoing_nodes));
     memset(&outgoing_nodes,0,sizeof(outgoing_nodes));
+    memset(&trigger_matrix,0,sizeof(trigger_matrix));
 
     while(1)
     {
@@ -79,59 +78,68 @@ int main(int argc, char const *argv[])
       }
     }
 
-    trigger_matrix = can_fire(ingoing_nodes,curr_state[0],n_transactions,n_places);
-
-
-    printf("State\n[");
-    for ( i = 1; i <= 1; i++ )
-    {
-        for ( j = 1; j <= n_places; j++ )
-        {
-            for ( k = 1; k <= n_transactions; k++ )
-            {
-                sum += *(trigger_matrix + k) * d_matrix[k][j];
-            }
-            state_matrix[i][j] = sum + curr_state[0][j];
-            printf(" %d ",state_matrix[i][j]);
-            sum = 0;
-        }
-    }
-    printf("]\n");
-
-
+    build_tree(n_transactions,n_places,d_matrix,trigger_matrix,curr_state,0, ingoing_nodes);
 
 
     return 0;
 }
 
-int * can_fire( int ingoing_nodes[5][5] , int state[5], int n_transactions, int n_places )
+int can_fire( int ingoing_nodes[6][6] , int state[6], int n_transactions, int n_places, int i)
 {
-    int i,j;
-    int * triggers = ( int *) malloc (sizeof(n_transactions + 1));
+    int j;
     int trigger = 0;
-    for ( i = 1; i <= n_transactions; i++ )
+    for ( j = 1; j <= n_places; j++ )
     {
-        for ( j = 1; j <= n_places; j++ )
+
+        if( ingoing_nodes[i][j] > 0 )
         {
-            if( ingoing_nodes[i][j] > 0 )
+            if ( state[j] >= ingoing_nodes[i][j] )
             {
-                if ( state[j] >= ingoing_nodes[i][j] )
-                {
-                    trigger = 1;
-                }
-                else
-                {
-                    trigger = 0;
-                }
+                trigger = 1;
+            }
+            else
+            {
+                trigger = 0;
             }
         }
-        *(triggers+i) = trigger;
-        trigger = 0;
     }
-
-    return triggers;
+    return trigger;
 }
 
+
+int build_tree(int n_transactions, int n_places, int d_matrix[6][6], int trigger_matrix[4],int curr_state[100][6],int init_state, int ingoing_nodes[6][6] )
+{
+    int i,j,k;
+    int sum = 0;
+    for ( i = 1; i <= n_transactions; i++ )
+    {
+        if (can_fire(ingoing_nodes,curr_state[init_state],n_transactions,n_places,i) == 1)
+        {
+            printf(" %d ", i);
+            trigger_matrix[i] = 1;
+            printf("State\n[");
+            for ( j = 1; j <= n_places; j++ )
+            {
+                for ( k = 1; k <= n_transactions; k++ )
+                {
+                    sum += trigger_matrix[k] * d_matrix[k][j];
+                }
+                curr_state[init_state+1][j] = sum + curr_state[init_state][j];
+                printf(" %d ",curr_state[init_state+1][j]);
+                sum = 0;
+            }
+            printf("]\n");
+
+            // Se for ciclo infinito n chamo build_tree || se não originar chamo;
+            trigger_matrix[i] = 0;
+            build_tree(n_transactions,n_places,d_matrix,trigger_matrix,curr_state,init_state+1, ingoing_nodes);
+
+
+
+        }
+    }
+
+}
 
 /* DEBUG: imprimir a matriz de "adjacencia"
 
