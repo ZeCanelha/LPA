@@ -4,7 +4,9 @@
 
 
 int can_fire(int ingoing_nodes[6][6], int state[6], int n_transactions, int n_places, int i);
-int build_tree(int n_transactions, int n_places, int d_matrix[6][6],int trigger_matrix[4], int curr_state[100][6],int init_state, int ingoing_nodes[6][6] );
+int build_tree(int n_transactions, int n_places, int d_matrix[6][6],int trigger_matrix[4], int curr_state[100][6],int init_state, int ingoing_nodes[6][6], int used_nodes[100][6]);
+void check_dominance( int state[6], int curr_state[100][6], int n_places , int curr_pos, int new_state[6]);
+int is_cycle( int current_state[6], int n_places , int used_nodes[100][6], int curr_pos);
 
 
 int main(int argc, char const *argv[])
@@ -17,19 +19,11 @@ int main(int argc, char const *argv[])
     int trigger_matrix[4];
     int n1, n2, n3;
 
-    /* TODO:
-     *
-     * Quando o ultimo numero for 2 corresponde ás ligações do nó a transição *
-     * Quando o ultimo numero for 1 corresponde ás ligações da transição para o nó *
-     * Função para calcular as transições que podem ser disparadas
-     * A matrix de trigger tem q ser calculada em separado
-     *
-    */
-
     scanf("%d %d",&n_places,&n_transactions);
     getchar();
 
     int curr_state[100][6];
+    int used_nodes[100][6];
 
     int ingoing_nodes[6][6];
     int outgoing_nodes[6][6];
@@ -66,11 +60,14 @@ int main(int argc, char const *argv[])
             }
         }
     }
-
+    printf("[");
     for( k = 1; k <= n_places; k++ )
     {
         scanf("%d",&curr_state[0][k]);
+        printf(" %d ", curr_state[0][k]);
+        used_nodes[0][k] = curr_state[0][k];
     }
+    printf("]\n");
 
     for (i = 1; i <= n_transactions; i++) {
       for (j = 1;  j <= n_places; j++) {
@@ -78,8 +75,7 @@ int main(int argc, char const *argv[])
       }
     }
 
-    build_tree(n_transactions,n_places,d_matrix,trigger_matrix,curr_state,0, ingoing_nodes);
-
+    build_tree(n_transactions,n_places,d_matrix,trigger_matrix,curr_state,0, ingoing_nodes, used_nodes);
 
     return 0;
 }
@@ -107,17 +103,20 @@ int can_fire( int ingoing_nodes[6][6] , int state[6], int n_transactions, int n_
 }
 
 
-int build_tree(int n_transactions, int n_places, int d_matrix[6][6], int trigger_matrix[4],int curr_state[100][6],int init_state, int ingoing_nodes[6][6] )
+int build_tree(int n_transactions, int n_places, int d_matrix[6][6], int trigger_matrix[4],int curr_state[100][6],int init_state, int ingoing_nodes[6][6], int used_nodes[100][6] )
 {
     int i,j,k;
     int sum = 0;
+
+    int new_state[6];
+
     for ( i = 1; i <= n_transactions; i++ )
     {
         if (can_fire(ingoing_nodes,curr_state[init_state],n_transactions,n_places,i) == 1)
         {
-            printf(" %d ", i);
             trigger_matrix[i] = 1;
-            printf("State\n[");
+
+            /* Calcular o State para cada trigger */
             for ( j = 1; j <= n_places; j++ )
             {
                 for ( k = 1; k <= n_transactions; k++ )
@@ -125,37 +124,99 @@ int build_tree(int n_transactions, int n_places, int d_matrix[6][6], int trigger
                     sum += trigger_matrix[k] * d_matrix[k][j];
                 }
                 curr_state[init_state+1][j] = sum + curr_state[init_state][j];
-                printf(" %d ",curr_state[init_state+1][j]);
+
                 sum = 0;
+            }
+            trigger_matrix[i] = 0;
+
+            /* Verficar se é um estado dominate */
+            check_dominance(curr_state[init_state+1],curr_state,n_places,init_state,new_state);
+
+            /* Imprimir */
+            printf("[");
+            for ( j = 1; j <= n_places; j++ )
+            {
+
+                if ( new_state[j] == -1)
+                    printf(" w ");
+                else
+                    printf(" %d ", new_state[j]);
             }
             printf("]\n");
 
-            // Se for ciclo infinito n chamo build_tree || se não originar chamo;
-            trigger_matrix[i] = 0;
-            build_tree(n_transactions,n_places,d_matrix,trigger_matrix,curr_state,init_state+1, ingoing_nodes);
+            /* Verificar se é ciclo: caso não seja ,recursão. */
 
 
+            if ( is_cycle(new_state,n_places,used_nodes,init_state) == 1 )
+            {
+                for ( j = 1; j  <= n_places; j++ )
+                    used_nodes[init_state+1][j] = new_state[j];
+
+                build_tree(n_transactions,n_places,d_matrix,trigger_matrix,curr_state,init_state+1, ingoing_nodes,used_nodes);
+
+            }
 
         }
     }
 
 }
 
-/* DEBUG: imprimir a matriz de "adjacencia"
-
-int i,j;
-for ( i = 1; i <= n_transactions; i++ )
+void check_dominance( int state[6], int curr_state[100][6], int n_places , int curr_pos, int new_state[6])
 {
-    printf("[");
-    for ( j = 1; j <= n_places; j++ )
+    int i, j,k;
+    int flag = 0;
+    int at_least = 0;
+    int cond = 0;
+
+
+    for ( i = 0; i <= curr_pos; i++ )
     {
-        printf(" %d ",ingoing_nodes[i][j]);
+        for ( j = 1; j <= n_places; j++ )
+        {
+            new_state[j] = state[j];
+            if ( curr_state[i][j] < state[j])
+                at_least++;
+
+            if ( curr_state[i][j] == state[j])
+                flag++;
+        }
+        cond = at_least + flag;
+
+        if ( at_least != 0 && cond == n_places )
+        {
+            for ( k = 1; k <= n_places; k++ )
+            {
+                if ( curr_state[i][k] < state[k])
+                    new_state[k] = -1;
+            }
+            break;
+        }
+        else
+        {
+            flag = 0;
+            at_least = 0;
+
+        }
     }
-    printf("]\n");
 }
 
-printf("[");
-for ( i = 1; i <= n_transactions; i++)
-    printf(" %d ", *(trigger_matrix+i) );
-printf("]\n");
-*/
+int is_cycle( int current_state[6], int n_places , int used_nodes[100][6] , int curr_pos)
+{
+    int i,j;
+    int checker = 0;
+    for ( i = 0 ; i <= curr_pos; i++ )
+    {
+        for ( j = 1; j <= n_places; j++ )
+        {
+            if ( current_state[j] == used_nodes[i][j] )
+                checker++;
+        }
+        if ( checker == n_places )
+            return 0;
+        else
+            checker = 0;
+    }
+
+    return 1;
+
+}
