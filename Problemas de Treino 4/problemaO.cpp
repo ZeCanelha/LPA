@@ -31,7 +31,7 @@ bool BellmanFord() {
 	//em cada iteração analisamos todos os nós
 	while(!fifo.empty()) {
 		int p = fifo.front();
-		//à partida marco o nó em analise como visitado
+		//à partida marco o nó em analise como não visitado para o poder analisar de novo
 		visited[p] = 0;
 		//correr todas as arestas que esse vertice tem
 		for (l = 0; l < star_systems; l++) {
@@ -39,7 +39,7 @@ bool BellmanFord() {
 				if(distances[p] + graph[p][l] < distances[l] && distances[p] != 2147483647 ) {
 					if(++analises[l] >= star_systems) {					//no maximo só analiso "star_systems"-1 vezes cada nó.
 						return true;								//se analisei pelo menos "star_systems" vezes então é porque começo a entrar num ciclo negativo
-					}												//se tiver a certeza que nao existem ciclos negativos, entao nao é este if só gasta recurso computacionais desnecessariamente
+					}												//se tiver a certeza que nao existem ciclos negativos, entao este if só gasta recurso computacionais desnecessariamente
 					if(visited[l] == 0) {
 						fifo.push(l);
 					}
