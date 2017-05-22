@@ -1,14 +1,17 @@
 1
 
-5
-Z G
-D Z
-A C
-C Y
-D G
 6
-Z G
-D Z
-A C
-C Y
-S D
+A B
+B E
+A E
+C F
+E C
+D A
+7
+A B
+D A
+E C
+C F
+D B
+B E
+D L
