@@ -34,9 +34,8 @@ void Graph::BFS(int s, int end_node)
     for(int i = 0; i < V; i++)
         visited[i] = false;
 
-
+    int last_con = end_node;
     list<int> queue;
-
 
     visited[s] = true;
     queue.push_back(s);
@@ -48,7 +47,10 @@ void Graph::BFS(int s, int end_node)
     {
 
         s = queue.front();
+        if ( s == last_con)
+            count_path++;
         queue.pop_front();
+
 
         for(i = adj[s].begin(); i != adj[s].end(); ++i)
         {
@@ -57,18 +59,18 @@ void Graph::BFS(int s, int end_node)
 
                 visited[*i] = true;
                 queue.push_back(*i);
+                last_con = * i;
             }
-            if ( *i == end_node - 1 )
+            if ( *i == end_node )
             {
                 flag = 0;
                 cout << count_path<< "\n";
                 break;
             }
-
         }
         if ( flag == 0)
             break;
-        count_path++;
+
 
     }
     if ( flag == 1)
@@ -78,6 +80,7 @@ void Graph::BFS(int s, int end_node)
 int main()
 {
     int max_aux;
+    int end_node;
     int max = 0;
     int i,j;
     int input;
@@ -91,7 +94,10 @@ int main()
         {
             cin >> max_aux;
             if ( max_aux > max )
+            {
                 max = max_aux;
+                end_node = i;
+            }
             for ( j = 0; j < max_aux; j++ )
             {
                 cin >> input;
@@ -101,8 +107,10 @@ int main()
                 g.addEdge(i,input-1);
             }
         }
+        g.BFS(starting_node-1,end_node);
+        max = 0;
+        end_node = 0;
 
-        g.BFS(starting_node-1,max);
     }
 
 
