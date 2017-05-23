@@ -6,7 +6,7 @@
 #include <math.h>
 using namespace std;
 
-//IDEIA: VERIFICAR SE CADA PAR (u,v) QUE EXISTE NA GONDOLA 1 É UM PAR "REACHABLE" NA GONDOLA 2
+//IDEIA: VERIFICAR SE CADA PAR (u,v) QUE EXISTE NA GONDOLA 1 É UM PAR "REACHABLE" NA GONDOLA 2 E VICE VERSA
 
 int test_cases;
 int gondola1[600][600];

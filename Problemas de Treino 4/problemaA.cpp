@@ -48,10 +48,12 @@ void dijkstra(long graph[200][200], int src) {
 
        sptSet[u] = true;
 
-       for (int v = 0; v < n_cities; v++)
+       for (int v = 0; v < n_cities; v++){
 
          if (!sptSet[v] && graph[u][v] && graph[u][v] != -1 && dist[u] != INT_MAX  && dist[u]+graph[u][v] < dist[v])
             dist[v] = dist[u] + graph[u][v];
+        }
+        
      }
 
      printSolution(dist, n_cities);
